@@ -686,6 +686,8 @@ h1 {
   border-radius: 16px;
   padding: 2rem;
   transform-style: preserve-3d;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
   cursor: pointer;
 }
@@ -700,6 +702,11 @@ h1 {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.blur-text {
   will-change: transform;
 }
 .social-links {
