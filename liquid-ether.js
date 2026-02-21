@@ -922,12 +922,17 @@
       this._loop = this.loop.bind(this);
       
       // Performance Upgrade: Debounce resize event to prevent FBO thrashing and lag
-      let resizeTimeout;
+      this.resizeDebounceDelay = 150;
+      this.resizeTimeout = null;
       this._resize = () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
+        if (this.resizeTimeout) {
+          window.clearTimeout(this.resizeTimeout);
+        }
+
+        this.resizeTimeout = window.setTimeout(() => {
+          this.resizeTimeout = null;
           this.resize();
-        }, 150);
+        }, this.resizeDebounceDelay);
       };
       window.addEventListener('resize', this._resize, { passive: true });
       

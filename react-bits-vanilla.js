@@ -23,20 +23,22 @@
     }
 
     bindEvents() {
+      if (!window.matchMedia('(hover: hover)').matches) return;
+
       const { signal } = this.controller;
 
       this.element.addEventListener('mouseenter', (event) => {
         this.rect = this.element.getBoundingClientRect();
         this.isActive = true;
-        this.pointerX = event.clientX;
-        this.pointerY = event.clientY;
+        this.pointerX = event.pageX;
+        this.pointerY = event.pageY;
         this.inner.style.transition = 'transform 100ms ease-out';
         this.requestUpdate();
       }, { signal });
 
       this.element.addEventListener('mousemove', (event) => {
-        this.pointerX = event.clientX;
-        this.pointerY = event.clientY;
+        this.pointerX = event.pageX;
+        this.pointerY = event.pageY;
         this.requestUpdate();
       }, { signal, passive: true });
 
@@ -55,8 +57,10 @@
         this.rafId = null;
         if (!this.isActive || !this.rect || !this.inner) return;
 
-        const x = this.pointerX - this.rect.left;
-        const y = this.pointerY - this.rect.top;
+        const left = this.rect.left + window.scrollX;
+        const top = this.rect.top + window.scrollY;
+        const x = this.pointerX - left;
+        const y = this.pointerY - top;
 
         const centerX = this.rect.width / 2;
         const centerY = this.rect.height / 2;
@@ -92,19 +96,21 @@
     }
 
     bindEvents() {
+      if (!window.matchMedia('(hover: hover)').matches) return;
+
       const { signal } = this.controller;
 
       this.element.addEventListener('mouseenter', (event) => {
         this.rect = this.element.getBoundingClientRect();
         this.isActive = true;
-        this.pointerX = event.clientX;
-        this.pointerY = event.clientY;
+        this.pointerX = event.pageX;
+        this.pointerY = event.pageY;
         this.requestUpdate();
       }, { signal });
 
       this.element.addEventListener('mousemove', (event) => {
-        this.pointerX = event.clientX;
-        this.pointerY = event.clientY;
+        this.pointerX = event.pageX;
+        this.pointerY = event.pageY;
         this.requestUpdate();
       }, { signal, passive: true });
 
@@ -123,10 +129,12 @@
         this.rafId = null;
         if (!this.isActive || !this.rect || !this.element) return;
 
+        const left = this.rect.left + window.scrollX;
+        const top = this.rect.top + window.scrollY;
         const centerX = this.rect.width / 2;
         const centerY = this.rect.height / 2;
-        const x = this.pointerX - this.rect.left - centerX;
-        const y = this.pointerY - this.rect.top - centerY;
+        const x = this.pointerX - left - centerX;
+        const y = this.pointerY - top - centerY;
 
         this.element.style.transition = 'transform 80ms linear';
         this.element.style.transform = `translate3d(${x * 0.25}px, ${y * 0.25}px, 0)`;
