@@ -1,6 +1,8 @@
-/* -- Indicating what the script is for: Liquid Ether Fluid Simulation (Ported from React to Vanilla JS) */
+/* -- Indicating what the script is for: Liquid Ether Fluid Simulation (Vanilla JS Port with Performance Upgrades) */
 
 (function(global) {
+  "use strict"; // Enforce strict mode for better performance and error catching
+
   // --- SHADERS ---
   const face_vert = `
     attribute vec3 position;
@@ -195,7 +197,14 @@
       this.container = container;
       this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
       this.resize();
-      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      
+      try {
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      } catch (e) {
+        console.warn("LiquidEther: WebGL not supported or disabled.", e);
+        return false;
+      }
+
       this.renderer.autoClear = false;
       this.renderer.setClearColor(new THREE.Color(0x000000), 0);
       this.renderer.setPixelRatio(this.pixelRatio);
@@ -205,6 +214,7 @@
       this.renderer.domElement.style.display = 'block';
       this.clock = new THREE.Clock();
       this.clock.start();
+      return true;
     }
     resize() {
       if (!this.container) return;
@@ -215,6 +225,7 @@
       if (this.renderer) this.renderer.setSize(this.width, this.height, false);
     }
     update() {
+      if (!this.clock) return;
       this.delta = this.clock.getDelta();
       this.time += this.delta;
     }
@@ -252,12 +263,12 @@
       const defaultView = (this.docTarget && this.docTarget.defaultView) || window;
       if (!defaultView) return;
       this.listenerTarget = defaultView;
-      this.listenerTarget.addEventListener('mousemove', this._onMouseMove);
+      this.listenerTarget.addEventListener('mousemove', this._onMouseMove, { passive: true });
       this.listenerTarget.addEventListener('touchstart', this._onTouchStart, { passive: true });
       this.listenerTarget.addEventListener('touchmove', this._onTouchMove, { passive: true });
-      this.listenerTarget.addEventListener('touchend', this._onTouchEnd);
+      this.listenerTarget.addEventListener('touchend', this._onTouchEnd, { passive: true });
       if (this.docTarget) {
-        this.docTarget.addEventListener('mouseleave', this._onDocumentLeave);
+        this.docTarget.addEventListener('mouseleave', this._onDocumentLeave, { passive: true });
       }
     }
     dispose() {
@@ -359,7 +370,6 @@
     }
   }
 
-  // Define Common and Mouse instances for this module
   const Common = new CommonClass();
   const Mouse = new MouseClass();
 
@@ -726,7 +736,6 @@
       this.createShaderPass();
     }
     getFloatType() {
-      // Basic check; modern Three.js often handles this, but sticking to logic
       const isIOS = /(iPad|iPhone|iPod)/i.test(navigator.userAgent);
       return isIOS ? THREE.HalfFloatType : THREE.FloatType;
     }
@@ -742,6 +751,8 @@
         wrapT: THREE.ClampToEdgeWrapping
       };
       for (let key in this.fbos) {
+        // Cleanup old target if it exists to prevent memory leaks on resize
+        if (this.fbos[key]) this.fbos[key].dispose();
         this.fbos[key] = new THREE.WebGLRenderTarget(this.fboSize.x, this.fboSize.y, opts);
       }
     }
@@ -801,7 +812,7 @@
     resize() {
       this.calcSize();
       for (let key in this.fbos) {
-        this.fbos[key].setSize(this.fboSize.x, this.fboSize.y);
+        if (this.fbos[key]) this.fbos[key].setSize(this.fboSize.x, this.fboSize.y);
       }
     }
     update() {
@@ -842,15 +853,13 @@
       this.init();
     }
     init() {
-      // Access simulation via the WebGLManager instance effectively
-      // But in this structure, Output owns Simulation
       this.simulation = new Simulation(LiquidEther.defaults);
       
       this.scene = new THREE.Scene();
       this.camera = new THREE.Camera();
       
       const paletteTex = makePaletteTexture(this.colors);
-      const bgVec4 = new THREE.Vector4(0, 0, 0, 0); // Always transparent background
+      const bgVec4 = new THREE.Vector4(0, 0, 0, 0);
 
       this.output = new THREE.Mesh(
         new THREE.PlaneGeometry(2, 2),
@@ -886,7 +895,10 @@
     constructor(container, props) {
       this.container = container;
       this.props = props;
-      Common.init(container);
+      
+      // Safety Check: If WebGL failed to init, halt execution gracefully
+      if (!Common.init(container)) return; 
+      
       Mouse.init(container);
       
       Mouse.autoIntensity = props.autoIntensity;
@@ -908,15 +920,33 @@
       this.init();
       
       this._loop = this.loop.bind(this);
-      this._resize = this.resize.bind(this);
       
-      window.addEventListener('resize', this._resize);
+      // Performance Upgrade: Debounce resize event to prevent FBO thrashing and lag
+      let resizeTimeout;
+      this._resize = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          this.resize();
+        }, 150);
+      };
+      window.addEventListener('resize', this._resize, { passive: true });
+      
+      // Performance/Battery Upgrade: Pause rendering entirely when user switches tabs
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          this.pause();
+        } else {
+          // Reset clock to prevent huge delta jumps
+          if (Common.clock) Common.clock.start();
+          this.start();
+        }
+      });
+
       this.running = false;
     }
 
     init() {
       this.container.prepend(Common.renderer.domElement);
-      // We need to set defaults for simulation here, referencing the static defaults on LiquidEther
       LiquidEther.defaults = { ...LiquidEther.defaults, ...this.props };
       this.output = new Output(this.props.colors);
     }
@@ -940,7 +970,7 @@
     }
 
     start() {
-      if (this.running) return;
+      if (this.running || !Common.renderer) return;
       this.running = true;
       this._loop();
     }
@@ -971,7 +1001,6 @@
       autoResumeDelay: 1000,
       autoRampDuration: 0.6,
       
-      // Mapping for the simulation class usage
       mouse_force: 20,
       cursor_size: 100,
       iterations_viscous: 32,
@@ -979,16 +1008,18 @@
     };
 
     constructor(container, options = {}) {
-      const opts = { ...LiquidEther.defaults, ...options };
+      if (!container) return; // Defensive check
       
-      // Map Friendly props to Internal Simulation props
+      const opts = { ...LiquidEther.defaults, ...options };
       opts.mouse_force = opts.mouseForce;
       opts.cursor_size = opts.cursorSize;
       opts.iterations_viscous = opts.iterationsViscous;
       opts.iterations_poisson = opts.iterationsPoisson;
 
       this.manager = new WebGLManager(container, opts);
-      this.manager.start();
+      if (this.manager && Common.renderer) {
+        this.manager.start();
+      }
     }
   }
 
