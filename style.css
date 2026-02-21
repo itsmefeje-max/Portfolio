@@ -615,3 +615,104 @@ h1 {
     flex-basis: 100%;
   }
 }
+
+/* -- Scroll Reveal (FadeContent) -- */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* -- StarBorder -- */
+.star-border {
+  position: relative;
+  display: inline-block;
+  padding: 1.5px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+}
+.star-border-glow.star-1,
+.star-border-glow.star-2 {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  animation: star-spin 4s linear infinite;
+  z-index: 0;
+}
+.star-border-glow.star-1 {
+  background: conic-gradient(transparent, rgba(255, 255, 255, 0.6), transparent 30%);
+}
+.star-border-glow.star-2 {
+  background: conic-gradient(transparent, rgba(100, 200, 255, 0.5), transparent 30%);
+  animation-delay: -2s;
+}
+.star-border-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-dark, #020617);
+  color: #fff;
+  padding: 0.8rem 2.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  z-index: 1;
+}
+@keyframes star-spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* -- TiltedCard -- */
+.tilted-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.tilted-card-inner {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+.tilted-card-content {
+  transform: translateZ(30px);
+}
+
+/* -- Magnet Button -- */
+.magnet-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  will-change: transform;
+}
+.action-buttons {
+  gap: 1.5rem;
+  align-items: center;
+}
+.roblox-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  line-height: 0;
+}

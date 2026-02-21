@@ -36,15 +36,14 @@
 
   <main>
     <section id="home" class="hero-section">
-      <div class="hero-content reveal">
+      <div class="hero-content reveal scroll-reveal">
         <div class="status-badge">
           <span class="pulse-dot"></span>
           <span>Welcome to my website. I am open for little to major commissions, I'm glad you visited Here</span>
         </div>
         
-        <h1 class="glitch-text" data-text="Building the Foundation">
-          Building the<br>
-          <span class="gradient-text shiny-text">Foundation</span>
+        <h1 class="glitch-text blur-text shiny-text" data-text="Building the Foundation">
+          Building the Foundation
         </h1>
         
         <p class="hero-sub">
@@ -53,20 +52,22 @@
           programming language, and learning while building my first game prototypes.
         </p>
 
-        <div class="cta-row">
-          <a href="#about" class="btn-glow">
-            Get to know me (maybe you like me xD)
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        <div class="cta-row action-buttons">
+          <a href="#about" class="star-border">
+            <span class="star-border-glow star-1"></span>
+            <span class="star-border-glow star-2"></span>
+            <span class="star-border-inner">Get to Know Me</span>
           </a>
-          <a href="https://www.roblox.com/users/5512860740/profile" target="_blank" class="link-sub">
-            <img src="https://cdn.simpleicons.org/roblox/white" alt="Roblox" width="20" height="20">
-            <span>Roblox Profile</span>
+          <a href="https://www.roblox.com/users/5512860740/profile" target="_blank" class="magnet-btn roblox-icon-btn" aria-label="Roblox Profile">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M5.426 3.064L1.144 18.232L16.312 22.514L20.594 7.346L5.426 3.064ZM11.968 15.656C10.222 15.161 9.198 13.335 9.693 11.589C10.188 9.843 12.014 8.819 13.76 9.314C15.506 9.809 16.53 11.635 16.035 13.381C15.54 15.127 13.714 16.151 11.968 15.656Z"/>
+            </svg>
           </a>
         </div>
       </div>
     </section>
       
-    <section id="about" class="section-padding">
+    <section id="about" class="section-padding scroll-reveal">
       <div class="container narrow">
         <div class="glass-panel profile-panel reveal spotlight-card">
           <div class="profile-header">
@@ -118,7 +119,7 @@
       </div>
     </section>
 
-    <section id="learning" class="section-padding">
+    <section id="learning" class="section-padding scroll-reveal">
       <div class="container">
         <div class="section-header reveal">
           <h2>Current Curriculum</h2>
@@ -127,9 +128,10 @@
         </div>
 
         <div class="bento-grid reveal">
-          <article class="bento-card spotlight-card">
+          <div class="tilted-card">
+          <article class="bento-card spotlight-card tilted-card-inner">
             <div class="card-bg" style="background: linear-gradient(45deg, #1a1a1a, #2a2a2a);"></div>
-            <div class="card-content">
+            <div class="card-content tilted-card-content">
               <div class="card-tags">
                 <span>Core Language</span>
                 <span>Backend</span>
@@ -141,9 +143,11 @@
               <img src="https://cdn.simpleicons.org/lua/white" width="40" height="40" alt="Lua">
             </div>
           </article>
+          </div>
 
-          <article class="bento-card spotlight-card">
-            <div class="card-content">
+          <div class="tilted-card">
+          <article class="bento-card spotlight-card tilted-card-inner">
+            <div class="card-content tilted-card-content">
               <div class="card-tags"><span>Workflow</span><span>Tools</span></div>
               <h3>Professional Workflow</h3>
               <p>I am gonna use professional tools soon, particularly <strong>VS Code</strong>, <strong>Rojo</strong>, and a more understanding of <strong>GitHub</strong>.</p>
@@ -152,9 +156,11 @@
               <img src="https://cdn.simpleicons.org/git/white" width="30" height="30" alt="Git">
             </div>
           </article>
+          </div>
 
-          <article class="bento-card spotlight-card">
-            <div class="card-content">
+          <div class="tilted-card">
+          <article class="bento-card spotlight-card tilted-card-inner">
+            <div class="card-content tilted-card-content">
               <div class="card-tags"><span>User Interface</span><span>Design</span></div>
               <h3>UI Architecture</h3>
               <p>I'm upgrading my skills in <strong>UI</strong> and making it even better.</p>
@@ -163,11 +169,12 @@
                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
             </div>
           </article>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="goals" class="section-padding">
+    <section id="goals" class="section-padding scroll-reveal">
       <div class="container">
         <div class="section-header reveal">
           <h2>The Roadmap</h2>
@@ -207,7 +214,7 @@
       </div>
     </section>
 
-    <section id="contact" class="section-padding footer-section">
+    <section id="contact" class="section-padding footer-section scroll-reveal">
       <div class="container">
         <div class="contact-box reveal spotlight-card">
           <h2>Contact and Connect with me</h2>
@@ -266,6 +273,7 @@
 
   <script src="liquid-ether.js"></script>
   <script src="shiny-text.js"></script>
+  <script src="react-bits-vanilla.js"></script>
   <script src="main.js"></script>
   
   <script>
