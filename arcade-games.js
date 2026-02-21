@@ -3,11 +3,14 @@
 /* -- Dependencies: None (Vanilla JS) */
 
 (() => {
+  "use strict";
+
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
   const keys = new Set();
 
   let activeGame = null;
 
+  // Prevent scrolling when using arrow keys/spacebar ONLY if a game is actively being played
   const shouldPreventScroll = (key) => [
     'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd'
   ].includes(key);
@@ -15,34 +18,39 @@
   window.addEventListener('keydown', (event) => {
     const key = event.key.toLowerCase();
     keys.add(key);
-    if (activeGame && shouldPreventScroll(key)) event.preventDefault();
+    if (activeGame && shouldPreventScroll(key)) {
+      event.preventDefault();
+    }
   });
 
   window.addEventListener('keyup', (event) => {
     keys.delete(event.key.toLowerCase());
   });
 
+  // Clear keys when window loses focus to prevent "stuck" inputs
   window.addEventListener('blur', () => keys.clear());
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) keys.clear();
   });
 
-  // FIXED: Renamed from FlappyBirthd to FlappyBird
+  // --- FLAPPY BIRD ---
   class FlappyBird {
     constructor(canvas, statusEl) {
       this.canvas = canvas;
       this.ctx = canvas.getContext('2d');
       this.statusEl = statusEl;
       this.running = false;
+      this.animationId = null;
 
       this.canvas.addEventListener('pointerdown', (e) => {
-        e.preventDefault(); // Prevent default touch actions
+        e.preventDefault(); // Prevent touch-action scrolling while tapping
         this.flap();
       });
       this.reset();
     }
 
     reset() {
+      if (this.animationId) cancelAnimationFrame(this.animationId);
       this.bird = { x: 120, y: this.canvas.height / 2, vy: 0, r: 12 };
       this.gravity = 0.34;
       this.jump = -5.8;
@@ -62,7 +70,7 @@
       this.running = true;
       this.lastTick = performance.now();
       this.statusEl.textContent = 'Tap to flap. Avoid the pipes.';
-      requestAnimationFrame((t) => this.loop(t));
+      this.animationId = requestAnimationFrame((t) => this.loop(t));
     }
 
     stop(message) {
@@ -93,7 +101,8 @@
     }
 
     update(deltaMs) {
-      const delta = deltaMs / 16.67;
+      const delta = deltaMs / 16.67; // Normalize to 60fps
+      
       if (keys.has(' ') || keys.has('arrowup') || keys.has('w')) {
         keys.delete(' ');
         keys.delete('arrowup');
@@ -118,16 +127,21 @@
           this.score += 1;
         }
       });
+      
+      // Cleanup off-screen pipes
       this.pipes = this.pipes.filter((pipe) => pipe.x + pipe.w > -10);
 
+      // Floor / Ceiling Collision
       if (this.bird.y - this.bird.r < 0 || this.bird.y + this.bird.r > this.canvas.height) {
         this.stop(`Game over. Score ${this.score}. Tap launch to retry.`);
       }
 
+      // Pipe Collision
       for (const pipe of this.pipes) {
         const hitX = this.bird.x + this.bird.r > pipe.x && this.bird.x - this.bird.r < pipe.x + pipe.w;
         const hitTop = this.bird.y - this.bird.r < pipe.topHeight;
         const hitBottom = this.bird.y + this.bird.r > pipe.topHeight + pipe.gap;
+        
         if (hitX && (hitTop || hitBottom)) {
           this.stop(`Game over. Score ${this.score}. Tap launch to retry.`);
           break;
@@ -138,6 +152,7 @@
     draw() {
       const ctx = this.ctx;
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      
       const gradient = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
       gradient.addColorStop(0, '#0ea5e9');
       gradient.addColorStop(1, '#082f49');
@@ -165,21 +180,29 @@
         this.draw();
         return;
       }
+      // Max delta of 40ms prevents massive jumps if user tabs out
       const deltaMs = Math.min(40, timestamp - this.lastTick);
       this.lastTick = timestamp;
+      
       this.update(deltaMs);
       this.draw();
-      if (this.running) requestAnimationFrame((t) => this.loop(t));
+      
+      if (this.running) {
+        this.animationId = requestAnimationFrame((t) => this.loop(t));
+      }
     }
   }
 
+  // --- SNAKE GAME ---
   class SnakeGame {
     constructor(canvas, statusEl) {
       this.canvas = canvas;
       this.ctx = canvas.getContext('2d');
       this.statusEl = statusEl;
       this.gridSize = 20;
+      this.animationId = null;
 
+      // Swipe support
       this.swipeStart = null;
       this.canvas.addEventListener('touchstart', (e) => {
         const touch = e.changedTouches[0];
@@ -191,15 +214,25 @@
         const touch = e.changedTouches[0];
         const dx = touch.clientX - this.swipeStart.x;
         const dy = touch.clientY - this.swipeStart.y;
-        if (Math.abs(dx) + Math.abs(dy) < 18) return;
-        if (Math.abs(dx) > Math.abs(dy)) this.setDirection(dx > 0 ? 'right' : 'left');
-        else this.setDirection(dy > 0 ? 'down' : 'up');
+        
+        // Prevent registering tiny taps as swipes
+        if (Math.abs(dx) + Math.abs(dy) < 25) return; 
+        
+        if (Math.abs(dx) > Math.abs(dy)) {
+          this.setDirection(dx > 0 ? 'right' : 'left');
+        } else {
+          this.setDirection(dy > 0 ? 'down' : 'up');
+        }
+        
+        // Auto-start on swipe if not running
+        if (!this.running && activeGame !== 'snake') this.start();
       }, { passive: true });
 
       this.reset();
     }
 
     reset() {
+      if (this.animationId) cancelAnimationFrame(this.animationId);
       this.cellsX = Math.floor(this.canvas.width / this.gridSize);
       this.cellsY = Math.floor(this.canvas.height / this.gridSize);
       this.snake = [{ x: 6, y: 7 }, { x: 5, y: 7 }, { x: 4, y: 7 }];
@@ -208,9 +241,10 @@
       this.food = this.makeFood();
       this.score = 0;
       this.stepAccumulator = 0;
-      this.stepMs = 120;
+      this.stepMs = 120; // Initial speed
       this.running = false;
       this.lastTick = performance.now();
+      
       if (activeGame === 'snake') activeGame = null;
       this.statusEl.textContent = 'Ready to launch.';
       this.draw();
@@ -222,7 +256,7 @@
       this.running = true;
       this.lastTick = performance.now();
       this.statusEl.textContent = 'Eat food. Avoid walls and tail.';
-      requestAnimationFrame((t) => this.loop(t));
+      this.animationId = requestAnimationFrame((t) => this.loop(t));
     }
 
     stop(message) {
@@ -245,18 +279,26 @@
     makeFood() {
       let point;
       let attempts = 0;
-      // FIXED: Added loop safety to prevent infinite loop if board is full
+      let isOccupied = true;
+      
+      // If the snake is massive, fallback to deterministic finding to prevent infinite loop crash
       do {
         point = {
           x: Math.floor(Math.random() * this.cellsX),
           y: Math.floor(Math.random() * this.cellsY)
         };
+        isOccupied = this.snake?.some((part) => part.x === point.x && part.y === point.y);
         attempts++;
-      } while (
-        this.snake?.some((part) => part.x === point.x && part.y === point.y) && 
-        attempts < 100
-      );
-      
+      } while (isOccupied && attempts < 100);
+
+      // Deterministic fallback
+      if (isOccupied) {
+        for (let x = 0; x < this.cellsX; x++) {
+          for (let y = 0; y < this.cellsY; y++) {
+            if (!this.snake?.some(p => p.x === x && p.y === y)) return {x, y};
+          }
+        }
+      }
       return point;
     }
 
@@ -278,6 +320,7 @@
 
       const outOfBounds = head.x < 0 || head.y < 0 || head.x >= this.cellsX || head.y >= this.cellsY;
       const hitBody = this.snake.some((part) => part.x === head.x && part.y === head.y);
+      
       if (outOfBounds || hitBody) {
         this.stop(`Game over. Score ${this.score}.`);
         return;
@@ -285,10 +328,12 @@
 
       this.snake.unshift(head);
       const ate = head.x === this.food.x && head.y === this.food.y;
+      
       if (ate) {
         this.score += 1;
         this.food = this.makeFood();
-        this.stepMs = Math.max(70, this.stepMs - 2);
+        // Ramp up speed slightly up to a cap
+        this.stepMs = Math.max(70, this.stepMs - 2); 
       } else {
         this.snake.pop();
       }
@@ -326,9 +371,11 @@
         ctx.stroke();
       }
 
+      // Draw Food
       ctx.fillStyle = '#ef4444';
       ctx.fillRect(this.food.x * this.gridSize + 2, this.food.y * this.gridSize + 2, this.gridSize - 4, this.gridSize - 4);
 
+      // Draw Snake
       this.snake.forEach((part, index) => {
         ctx.fillStyle = index === 0 ? '#22d3ee' : '#14b8a6';
         ctx.fillRect(part.x * this.gridSize + 2, part.y * this.gridSize + 2, this.gridSize - 4, this.gridSize - 4);
@@ -344,10 +391,13 @@
       this.lastTick = timestamp;
       this.update(deltaMs);
       this.draw();
-      if (this.running) requestAnimationFrame((t) => this.loop(t));
+      if (this.running) {
+        this.animationId = requestAnimationFrame((t) => this.loop(t));
+      }
     }
   }
 
+  // --- BLOCK PUZZLE ---
   class BlockPuzzle {
     constructor(canvas, statusEl) {
       this.canvas = canvas;
@@ -404,10 +454,8 @@
     }
 
     getPointer(event) {
-      // FIXED: PointerEvent does not have 'touches'. Use clientX/Y directly.
       const clientX = event.clientX;
       const clientY = event.clientY;
-      
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
       const scaleY = this.canvas.height / rect.height;
@@ -464,7 +512,7 @@
 
     handleClick(event) {
       if (!this.running) return;
-      event.preventDefault(); // Prevent default touch behavior
+      event.preventDefault(); 
       const pointer = this.getPointer(event);
 
       const queueY = 320;
@@ -488,6 +536,7 @@
       }
 
       this.place(shape, gridX, gridY);
+      
       if (!this.anyMoveAvailable()) {
         this.stop(`No moves left. Final score ${this.score}.`);
         return;
@@ -525,9 +574,11 @@
       this.queue.forEach((shape, index) => {
         const x = 28 + index * 160;
         const selected = index === this.selected;
+        
         ctx.fillStyle = selected ? 'rgba(14,165,233,0.24)' : 'rgba(15,23,42,0.95)';
         ctx.strokeStyle = selected ? '#38bdf8' : 'rgba(148,163,184,0.45)';
         ctx.lineWidth = 2;
+        
         ctx.fillRect(x, 302, 130, 46);
         ctx.strokeRect(x, 302, 130, 46);
         this.drawShape(shape, x + 14, 316, '#a78bfa');
@@ -535,16 +586,32 @@
     }
   }
 
+  // --- UI WIRING UTILITY ---
   function wireGame(gameName, instance) {
     const buttons = document.querySelectorAll(`[data-game="${gameName}"]`);
     buttons.forEach((button) => {
-      button.addEventListener('click', () => {
+      
+      const handleAction = (e) => {
+        // Prevent default on pointerdown to stop double-firing the click event
+        if (e.type === 'pointerdown' && e.cancelable) e.preventDefault();
+        
         const action = button.dataset.action;
         if (action === 'start') instance.start();
-        if (action === 'reset') instance.reset();
-        if (action === 'tap' && typeof instance.flap === 'function') instance.flap();
-        if (typeof instance.setDirection === 'function' && ['up', 'down', 'left', 'right'].includes(action)) {
+        else if (action === 'reset') instance.reset();
+        else if (action === 'tap' && typeof instance.flap === 'function') instance.flap();
+        else if (typeof instance.setDirection === 'function' && ['up', 'down', 'left', 'right'].includes(action)) {
           instance.setDirection(action);
+        }
+      };
+
+      // Pointerdown gives instant zero-latency feedback on mobile
+      button.addEventListener('pointerdown', handleAction);
+      
+      // Accessibility fallback for keyboard (Tab + Enter/Space)
+      button.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleAction(e);
         }
       });
     });
@@ -557,7 +624,6 @@
 
     if (!flappyCanvas || !snakeCanvas || !blockCanvas) return;
 
-    // Fixed: Updated class name here
     const flappy = new FlappyBird(flappyCanvas, document.getElementById('flappy-status'));
     const snake = new SnakeGame(snakeCanvas, document.getElementById('snake-status'));
     const block = new BlockPuzzle(blockCanvas, document.getElementById('block-status'));
