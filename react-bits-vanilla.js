@@ -66,6 +66,40 @@ class MagnetButton {
   }
 }
 
+class BlurText {
+  constructor(element) {
+    this.element = element;
+    const text = this.element.innerText;
+    this.element.innerHTML = '';
+
+    text.split('').forEach((char, index) => {
+      const span = document.createElement('span');
+      span.innerText = char === ' ' ? '\u00A0' : char;
+      span.style.opacity = '0';
+      span.style.filter = 'blur(12px)';
+      span.style.transform = 'translate3d(0, 15px, 0)';
+      span.style.display = 'inline-block';
+      span.style.willChange = 'opacity, filter, transform';
+      span.style.transition = 'opacity 0.6s ease, filter 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      span.style.transitionDelay = `${index * 0.05}s`;
+      this.element.appendChild(span);
+    });
+
+    requestAnimationFrame(() => {
+      setTimeout(() => this.animateIn(), 50);
+    });
+  }
+
+  animateIn() {
+    const spans = this.element.querySelectorAll('span');
+    spans.forEach((span) => {
+      span.style.opacity = '1';
+      span.style.filter = 'blur(0px)';
+      span.style.transform = 'translate3d(0, 0, 0)';
+    });
+  }
+}
+
 class ScrollReveal {
   constructor() {
     this.observer = new IntersectionObserver((entries) => {
@@ -86,7 +120,9 @@ class ScrollReveal {
 function initReactBits() {
   document.querySelectorAll('.tilted-card').forEach((el) => new TiltedCard(el));
   document.querySelectorAll('.magnet-btn').forEach((el) => new MagnetButton(el));
-  new ScrollReveal();
+  document.querySelectorAll('.blur-text').forEach((el) => new BlurText(el));
+
+  if (typeof ScrollReveal !== 'undefined') new ScrollReveal();
 }
 
 document.addEventListener('DOMContentLoaded', initReactBits);
