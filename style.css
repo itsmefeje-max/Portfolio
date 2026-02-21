@@ -1,4 +1,4 @@
-/* -- Indicating what the script is for: Styles with Mobile UI Fixes & Optimization */
+/* -- Indicating what the script is for: Styles with Mobile UI Fixes, Optimization & Accessibility */
 
 :root {
   /* COLORS */
@@ -33,6 +33,19 @@ body {
   position: relative;
 }
 
+/* --- ACCESSIBILITY FOCUS STATES --- */
+a:focus-visible, button:focus-visible, input:focus-visible, canvas:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.btn-primary:focus-visible, .btn-glow:focus-visible, .btn-surprise:focus-visible {
+  border-radius: 99px; /* Matches the pill-shape buttons */
+}
+.method-card:focus-visible {
+  border-radius: 16px;
+}
+
 /* --- LIQUID ETHER BACKGROUND --- */
 #liquid-ether-bg {
   position: fixed;
@@ -40,6 +53,8 @@ body {
   z-index: -1;
   width: 100vw;
   height: 100vh;
+  /* Performance/Mobile Upgrade: 100dvh prevents layout shifts on mobile when address bar hides */
+  height: 100dvh; 
   pointer-events: auto; 
 }
 main, header, footer { position: relative; z-index: 10; }
@@ -70,7 +85,7 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
 /* --- UI COMPONENTS --- */
 .glass-nav {
   position: fixed; top: 0; width: 100%; height: var(--nav-height);
-  background: rgba(2, 6, 23, 0.85); /* Slightly darker for better mobile read */
+  background: rgba(2, 6, 23, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-light);
@@ -88,14 +103,9 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
   display: flex; align-items: center; gap: 0; 
   font-family: var(--font-display); 
   font-weight: 800; 
-  font-size: 1.8rem; /* Made bigger as requested */
+  font-size: 1.8rem;
   letter-spacing: -0.03em;
   line-height: 1;
-}
-
-/* SAFETY: Hide the logo-mark globally so it disappears from 404/Arcade automatically */
-.logo-mark {
-  display: none !important; 
 }
 
 .nav-links { display: flex; gap: 32px; align-items: center; }
@@ -128,23 +138,22 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.8rem; color: #a5b4fc; margin-bottom: 32px;
   backdrop-filter: blur(4px);
-  max-width: 100%; /* Prevent overflow on small screens */
+  max-width: 100%; 
   text-align: left;
 }
 .pulse-dot {
-  flex-shrink: 0; /* Prevent dot from squishing */
+  flex-shrink: 0; 
   width: 8px; height: 8px; background: #4ade80; border-radius: 50%;
   box-shadow: 0 0 12px #4ade80; animation: pulse 2s infinite;
 }
 
 h1 {
   font-family: var(--font-display);
-  /* Adjusted clamp for mobile safety */
   font-size: clamp(2.5rem, 6vw, 5.5rem);
   line-height: 1.1; 
   margin-bottom: 24px;
   letter-spacing: -0.04em; font-weight: 700;
-  word-wrap: break-word; /* Prevent overflow */
+  word-wrap: break-word; 
 }
 
 .gradient-text {
@@ -189,7 +198,7 @@ h1 {
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, border-color 0.3s ease;
-  will-change: transform, opacity; /* Mobile Optimization */
+  will-change: transform, opacity;
 }
 
 /* Spotlight Overlay */
@@ -207,7 +216,6 @@ h1 {
   opacity: 0;
   transition: opacity 0.5s;
 }
-/* Ensure spotlight is visible on hover OR when active class is added by JS */
 .spotlight-card:hover::before, .spotlight-card.touch-active::before { opacity: 1; }
 .spotlight-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-4px); }
 
@@ -460,23 +468,36 @@ h1 {
   .stats-row { grid-template-columns: 1fr; gap: 32px; }
   .bento-grid, .goals-wrapper { grid-template-columns: 1fr; }
   
-  /* Fix Navigation Overlap & Stacking */
+  /* Fix Navigation Overlap, Stacking & Accessibility */
   .nav-links {
     position: fixed; 
     top: var(--nav-height); 
     left: 0; right: 0;
     height: auto;
-    background: #020617; /* Solid background to prevent see-through mess */
+    background: #020617;
     flex-direction: column; 
     padding: 40px 24px; 
     gap: 24px;
     border-bottom: 1px solid var(--border-light);
     transform: translateY(-150%); 
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    z-index: 999; /* Ensure it is ABOVE main content */
+    
+    /* Accessibility Fix: Make sure it's completely un-focusable when hidden */
+    visibility: hidden;
+    opacity: 0;
+    
+    /* Hardware acceleration to prevent mobile animation flickering */
+    transform: translateY(-150%) translateZ(0); 
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, visibility 0.4s; 
+    
+    z-index: 999; 
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   }
-  .nav-links.active { transform: translateY(0); }
+  
+  .nav-links.active { 
+    transform: translateY(0) translateZ(0); 
+    visibility: visible;
+    opacity: 1;
+  }
   
   /* Mobile Menu Button */
   .mobile-toggle { display: block; background: none; border: none; padding: 10px; cursor: pointer; }
