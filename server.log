@@ -1,0 +1,15 @@
+127.0.0.1 - - [22/Feb/2026 16:00:44] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:44] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:44] "GET /liquid-ether.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:44] "GET /main.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:44] "GET /react-bits-vanilla.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:44] "GET /shiny-text.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:53] "GET /Gallery.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:00:53] "GET /gallery.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /Gallery.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /liquid-ether.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /shiny-text.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /react-bits-vanilla.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /main.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 16:01:25] "GET /gallery.js HTTP/1.1" 200 -

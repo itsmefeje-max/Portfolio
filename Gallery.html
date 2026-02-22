@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | Itsmefeje</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="liquid-ether-bg"></div>
+
+  <header class="glass-nav">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center;"><span id="nav-logo-text">Itsmefeje</span></a>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav-links">
+        <a href="index.html#about">About</a>
+        <a href="index.html#learning">Learning</a>
+        <a href="index.html#goals">Goals</a>
+        <a href="Gallery.html" style="color: white; font-weight: 600;">Gallery</a>
+        <a href="index.html#contact" class="btn-primary">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="gallery" class="section-padding" style="padding-top: 150px; min-height: 80vh;">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Game Gallery</h2>
+          <p>A collection of The Legend of Zelda visuals.</p>
+        </div>
+
+        <div class="gallery-grid">
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+1" alt="Zelda Image 1" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+2" alt="Zelda Image 2" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+3" alt="Zelda Image 3" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+4" alt="Zelda Image 4" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+5" alt="Zelda Image 5" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+6" alt="Zelda Image 6" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+7" alt="Zelda Image 7" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+8" alt="Zelda Image 8" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+9" alt="Zelda Image 9" class="gallery-img" loading="lazy">
+           </div>
+           <div class="gallery-item reveal">
+             <img src="https://placehold.co/600x400/0f172a/ffffff?text=Zelda+10" alt="Zelda Image 10" class="gallery-img" loading="lazy">
+           </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+        <div class="footer-bottom">
+        <p>&copy; <span id="year"></span> Itsmefeje. Personal Website.</p>
+        <div class="footer-links">
+            <a href=" https://www.fejelude.xyz/ " target="_blank">Website Updated Recently on February 22, 2026 </a>
+        </div>
+        </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Structure -->
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+    <button class="lightbox-prev" aria-label="Previous image">&#10094;</button>
+    <div class="lightbox-content-wrapper">
+      <img src="" alt="" class="lightbox-content">
+    </div>
+    <button class="lightbox-next" aria-label="Next image">&#10095;</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <script src="liquid-ether.js"></script>
+  <script src="shiny-text.js"></script>
+  <script src="react-bits-vanilla.js"></script>
+  <script src="main.js"></script>
+  <script src="gallery.js"></script>
+
+  <script>
+    // Initialize the background with Blue Ether Palette
+    document.addEventListener('DOMContentLoaded', () => {
+      new LiquidEther(document.getElementById('liquid-ether-bg'), {
+        colors: ['#000000', '#0f172a', '#3b82f6', '#1d4ed8'], // Blue Palette
+        mouseForce: 25,
+        cursorSize: 80,
+        autoDemo: true
+      });
+    });
+  </script>
+</body>
+</html>
