@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | Itsmefeje</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="liquid-ether-bg"></div>
+
+  <header class="glass-nav">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+          <span id="nav-logo-text">Itsmefeje</span>
+        </a>
+      </div>
+
+      <button class="mobile-toggle" aria-label="Toggle Menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav-links">
+        <a href="/#about">About</a>
+        <a href="/#learning">Learning</a>
+        <a href="/#goals">Goals</a>
+        <a href="/Gallery">Gallery</a>
+        <a href="/#contact" class="btn-primary">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section" style="min-height: 60vh;">
+      <div class="hero-content reveal scroll-reveal" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <h1 class="blur-text shiny-text" style="font-size: 4rem; margin-bottom: 0;">Game Gallery</h1>
+        <p style="color: #888; font-size: 1.2rem; margin-bottom: 2rem;">A collection of my favorite Legend of Zelda art.</p>
+      </div>
+    </section>
+
+    <section class="section-padding scroll-reveal">
+      <div class="container">
+        <div class="gallery-grid">
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_Breath_of_the_Wild.jpg" alt="Breath of the Wild">
+            <div class="gallery-caption">Breath of the Wild</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_Tears_of_the_Kingdom_cover.jpg" alt="Tears of the Kingdom">
+            <div class="gallery-caption">Tears of the Kingdom</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_Ocarina_of_Time.jpg" alt="Ocarina of Time">
+            <div class="gallery-caption">Ocarina of Time</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_-_Majora%27s_Mask_Box_Art.jpg" alt="Majora's Mask">
+            <div class="gallery-caption">Majora's Mask</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_The_Wind_Waker.jpg" alt="The Wind Waker">
+            <div class="gallery-caption">The Wind Waker</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_Twilight_Princess_Game_Cover.jpg" alt="Twilight Princess">
+            <div class="gallery-caption">Twilight Princess</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/Legend_of_Zelda_Skyward_Sword_boxart.png" alt="Skyward Sword">
+            <div class="gallery-caption">Skyward Sword</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_Link%27s_Awakening_%282019_video_game%29.jpg" alt="Link's Awakening">
+            <div class="gallery-caption">Link's Awakening</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/The_Legend_of_Zelda_A_Link_to_the_Past_SNES_Game_Cover.jpg" alt="A Link to the Past">
+            <div class="gallery-caption">A Link to the Past</div>
+          </div>
+          <div class="gallery-item spotlight-card">
+            <img src="https://en.wikipedia.org/wiki/Special:FilePath/Legend_of_zelda_cover_%28with_cartridge%29_gold.png" alt="The Legend of Zelda">
+            <div class="gallery-caption">The Legend of Zelda (1986)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section-padding footer-section scroll-reveal">
+      <div class="container">
+        <footer>
+          <div class="footer-bottom">
+            <p>&copy; <span id="year"></span> Itsmefeje. Personal Website.</p>
+            <div class="footer-links">
+              <a href=" https://www.fejelude.xyz/ " target="_blank">Website Updated Recently on February 22, 2026 </a>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <script src="liquid-ether.js"></script>
+  <script src="shiny-text.js"></script>
+  <script src="react-bits-vanilla.js"></script>
+  <script src="main.js"></script>
+
+  <script>
+    // Initialize the background with a BLUE palette
+    document.addEventListener('DOMContentLoaded', () => {
+      new LiquidEther(document.getElementById('liquid-ether-bg'), {
+        colors: ['#000000', '#0f172a', '#1e3a8a', '#3b82f6'], // Blue Variation
+        mouseForce: 25,
+        cursorSize: 80,
+        autoDemo: true
+      });
+    });
+  </script>
+</body>
+</html>
