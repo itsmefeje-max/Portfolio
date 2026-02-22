@@ -100,9 +100,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
     link.addEventListener('click', (event) => {
       const href = link.getAttribute('href');
+
+      // Close mobile menu if open
       toggleMobileMenu(true);
 
-      if (!href || href.length <= 1) return;
+      if (!href || href === '#') {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      if (href.length <= 1) return;
 
       const targetId = href.slice(1);
       const section = document.getElementById(targetId);
