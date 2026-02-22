@@ -57,6 +57,7 @@
       this.pipes = [];
       this.spawnTimer = 0;
       this.score = 0;
+      this.highScore = parseInt(localStorage.getItem('flappy-highscore') || '0', 10);
       this.lastTick = performance.now();
       this.running = false;
       if (activeGame === 'flappy') activeGame = null;
@@ -75,6 +76,10 @@
 
     stop(message) {
       this.running = false;
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        localStorage.setItem('flappy-highscore', this.highScore);
+      }
       if (activeGame === 'flappy') activeGame = null;
       this.statusEl.textContent = message;
     }
@@ -173,6 +178,10 @@
       ctx.fillStyle = '#0f172a';
       ctx.font = '700 16px Inter, sans-serif';
       ctx.fillText(`Score: ${this.score}`, 14, 26);
+
+      ctx.textAlign = 'right';
+      ctx.fillText(`High: ${this.highScore}`, this.canvas.width - 14, 26);
+      ctx.textAlign = 'left';
     }
 
     loop(timestamp) {
@@ -240,6 +249,7 @@
       this.pendingDirection = 'right';
       this.food = this.makeFood();
       this.score = 0;
+      this.highScore = parseInt(localStorage.getItem('snake-highscore') || '0', 10);
       this.stepAccumulator = 0;
       this.stepMs = 120; // Initial speed
       this.running = false;
@@ -261,6 +271,10 @@
 
     stop(message) {
       this.running = false;
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        localStorage.setItem('snake-highscore', this.highScore);
+      }
       if (activeGame === 'snake') activeGame = null;
       this.statusEl.textContent = message;
     }
@@ -380,6 +394,13 @@
         ctx.fillStyle = index === 0 ? '#22d3ee' : '#14b8a6';
         ctx.fillRect(part.x * this.gridSize + 2, part.y * this.gridSize + 2, this.gridSize - 4, this.gridSize - 4);
       });
+
+      // Draw High Score
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = '600 14px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(`High: ${this.highScore}`, this.canvas.width - 12, this.canvas.height - 12);
+      ctx.textAlign = 'left';
     }
 
     loop(timestamp) {
@@ -428,6 +449,7 @@
       this.queue = [this.randomShape(), this.randomShape(), this.randomShape()];
       this.selected = 0;
       this.score = 0;
+      this.highScore = parseInt(localStorage.getItem('block-highscore') || '0', 10);
       this.running = false;
       if (activeGame === 'block') activeGame = null;
       this.statusEl.textContent = 'Ready to launch.';
@@ -448,6 +470,10 @@
 
     stop(message) {
       this.running = false;
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        localStorage.setItem('block-highscore', this.highScore);
+      }
       if (activeGame === 'block') activeGame = null;
       this.statusEl.textContent = message;
       this.draw();
@@ -569,6 +595,13 @@
       ctx.fillStyle = '#e2e8f0';
       ctx.font = '600 15px Inter, sans-serif';
       ctx.fillText(`Score: ${this.score}`, 24, 16);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`High: ${this.highScore}`, this.canvas.width - 24, 16);
+      ctx.textAlign = 'left';
+
+      ctx.fillStyle = '#e2e8f0';
       ctx.fillText('Pieces', 24, 308);
 
       this.queue.forEach((shape, index) => {
@@ -581,7 +614,27 @@
         
         ctx.fillRect(x, 302, 130, 46);
         ctx.strokeRect(x, 302, 130, 46);
-        this.drawShape(shape, x + 14, 316, '#a78bfa');
+
+        // Calculate shape dimensions for centering
+        let maxX = 0;
+        let maxY = 0;
+        shape.forEach(p => {
+            if (p.x > maxX) maxX = p.x;
+            if (p.y > maxY) maxY = p.y;
+        });
+
+        // Each block is 14px + 2px logical gap in drawShape logic?
+        // drawShape: x + cell.x * 16.
+        // The drawn rect is 14px wide.
+        // So width = (maxX * 16) + 14.
+        // Height = (maxY * 16) + 14.
+        const shapeW = (maxX * 16) + 14;
+        const shapeH = (maxY * 16) + 14;
+
+        const offsetX = x + (130 - shapeW) / 2;
+        const offsetY = 302 + (46 - shapeH) / 2;
+
+        this.drawShape(shape, offsetX, offsetY, '#a78bfa');
       });
     }
   }
