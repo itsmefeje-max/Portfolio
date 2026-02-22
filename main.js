@@ -121,4 +121,29 @@ document.addEventListener('DOMContentLoaded', () => {
       section.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     });
   });
+
+  // Discord Copy to Clipboard Logic
+  const copyDiscord = document.getElementById('copy-discord');
+  const discordVal = document.getElementById('discord-val');
+  if (copyDiscord && discordVal) {
+    copyDiscord.addEventListener('click', () => {
+      // Remove "@ " from the text to get just the username if needed,
+      // but usually the full "@ itsmefeje" or just "itsmefeje" is fine.
+      // We'll copy "itsmefeje"
+      const textToCopy = discordVal.textContent.replace('@ ', '').trim();
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = discordVal.textContent;
+        discordVal.textContent = 'Copied!';
+        copyDiscord.style.pointerEvents = 'none'; // Prevent double clicks during feedback
+
+        setTimeout(() => {
+          discordVal.textContent = originalText;
+          copyDiscord.style.pointerEvents = 'auto';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    });
+  }
 });
