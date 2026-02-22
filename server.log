@@ -1,0 +1,7 @@
+127.0.0.1 - - [22/Feb/2026 15:57:07] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 15:57:07] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 15:57:07] "GET /main.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 15:57:07] "GET /shiny-text.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 15:57:07] "GET /react-bits-vanilla.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 15:57:07] "GET /liquid-ether.js HTTP/1.1" 200 -
+127.0.0.1 - - [22/Feb/2026 15:57:13] "GET /Gallery.html HTTP/1.1" 200 -
