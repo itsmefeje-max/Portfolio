@@ -12,13 +12,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   
   <div id="liquid-ether-bg"></div>
 
   <header class="glass-nav">
     <div class="container nav-container">
       <div class="logo">
-        <span id="nav-logo-text">Itsmefeje</span>
+        <a href="/">
+          <span id="nav-logo-text">Itsmefeje</span>
+        </a>
       </div>
       
       <button class="mobile-toggle" aria-label="Toggle Menu">
@@ -34,11 +37,11 @@
     </div>
   </header>
 
-  <main>
+  <main id="main-content">
     <section id="home" class="hero-section">
       <div class="hero-content reveal scroll-reveal" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
         <h1 class="blur-text shiny-text" style="font-size: 4rem; margin-bottom: 0;">Fejelude Von O. Laxamana</h1>
-        <p style="color: #888; font-size: 1.2rem; margin-bottom: 2rem;">Developer, Digital Artists, & Engineer</p>
+        <p style="color: #888; font-size: 1.2rem; margin-bottom: 2rem;">Developer, Digital Artist, & Engineer</p>
 
         <div class="action-buttons" style="display: flex; gap: 1.5rem; align-items: center; justify-content: center; margin-top: 1rem;">
           <a href="#about" class="star-border">
@@ -220,15 +223,15 @@
               </div>
             </a>
             
-            <div class="method-card">
+            <button class="method-card" id="copy-discord" aria-label="Copy Discord username">
               <div class="icon-circle">
-                <img src="https://cdn.simpleicons.org/discord/white" width="24" height="24">
+                <img src="https://cdn.simpleicons.org/discord/white" width="24" height="24" alt="Discord">
               </div>
               <div>
                 <span class="label">Discord</span>
-                <span class="value">@ itsmefeje</span>
+                <span class="value" id="discord-val">@ itsmefeje</span>
               </div>
-            </div>
+            </button>
           </div>
 
           <div class="arcade-highlight spotlight-card">

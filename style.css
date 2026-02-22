@@ -39,6 +39,24 @@ a:focus-visible, button:focus-visible, input:focus-visible, canvas:focus-visible
   outline-offset: 4px;
   border-radius: 4px;
 }
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #020617;
+  padding: 12px 24px;
+  z-index: 2000;
+  border-radius: 0 0 12px 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.skip-link:focus {
+  top: 0;
+}
 .btn-primary:focus-visible, .btn-glow:focus-visible, .btn-surprise:focus-visible {
   border-radius: 99px; /* Matches the pill-shape buttons */
 }
@@ -118,6 +136,13 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
   font-size: 1.8rem;
   letter-spacing: -0.03em;
   line-height: 1;
+}
+.logo a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .nav-links { display: flex; gap: 32px; align-items: center; }
@@ -276,6 +301,19 @@ h1 {
   background: rgba(255,255,255,0.03); border: 1px solid var(--border-light);
   padding: 16px 32px; border-radius: 16px; text-decoration: none;
   transition: 0.3s;
+  cursor: pointer;
+}
+button.method-card {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: left;
+  line-height: inherit;
+}
+.method-card:hover, .method-card:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 /* ARCADE */

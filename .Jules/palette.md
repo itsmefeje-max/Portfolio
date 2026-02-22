@@ -1,0 +1,3 @@
+## 2026-02-22 - [Interactive Contact Cards]
+**Learning:** In a minimal, high-aesthetic portfolio, users often expect card-like contact methods to be interactive. Converting static "Discord" text into a "Click to Copy" button with immediate "Copied!" feedback significantly improves the perceived utility and "delight" of the contact section without requiring a full form.
+**Action:** When seeing static social handles or usernames presented in cards, suggest or implement a copy-to-clipboard interaction with visual feedback.
