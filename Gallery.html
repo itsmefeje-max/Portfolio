@@ -10,6 +10,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Smooth hover zoom effect for gallery images */
+    .gallery-item {
+      overflow: hidden;
+      border-radius: 12px;
+      transition: box-shadow 0.4s ease;
+      /* Initial state for GSAP animation */
+      opacity: 0; 
+      visibility: hidden;
+    }
+
+    .gallery-item:hover {
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.25); /* Subtle blue glow matching your palette */
+    }
+
+    .gallery-item .gallery-img {
+      transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .gallery-item:hover .gallery-img {
+      transform: scale(1.06);
+    }
+    
+    .section-header.reveal {
+      opacity: 0;
+      visibility: hidden;
+    }
+  </style>
 </head>
 <body>
 
@@ -44,79 +76,66 @@
         </div>
 
         <div class="gallery-grid">
-           <!-- Memory 1 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/6ab1a7069b9cf/2017032012061100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Subdued Ceremony" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Subdued Ceremony</div>
            </div>
            
-           <!-- Memory 3 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/e7ac5ae31f79c/2017032012061400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Resolve and Grief" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Resolve and Grief</div>
            </div>
            
-           <!-- Memory 5 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/a1832a2a17367/2017032012061600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Zelda's Resentment" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Zelda's Resentment</div>
            </div>
            
-           <!-- Memory 7 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/019b65df93816/2017032012061900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Blades of the Yiga" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Blades of the Yiga</div>
            </div>
            
-           <!-- Memory 8 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/0802b6803f51d/2017032012062100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="A Premonition" class="gallery-img" loading="lazy">
              <div class="gallery-caption">A Premonition</div>
            </div>
            
-           <!-- Memory 9 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/3cfe5dff30b59/2017032012062400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Silent Princess" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Silent Princess</div>
            </div>
            
-           <!-- Memory 11 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/e27338713842b/2017032012062600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Shelter from the Storm" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Shelter from the Storm</div>
            </div>
 
-           <!-- Memory 12 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/ddb5b64be8b4e/2017032012062900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Father and Daughter" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Father and Daughter</div>
            </div>
            
-           <!-- Memory 13 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/162c0e3669ce3/2017032012063100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Slumbering Power" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Slumbering Power</div>
            </div>
            
-           <!-- Memory 14 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/385c9f3e5a956/2017032012063400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="To Mount Lanayru" class="gallery-img" loading="lazy">
              <div class="gallery-caption">To Mount Lanayru</div>
            </div>
 
-           <!-- Memory 15 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/93e7be8681662/2017032012063600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Return of Calamity Ganon" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Return of Calamity Ganon</div>
            </div>
 
-           <!-- Memory 16 -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/9bd7196d2a703/2017032012063900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Despair" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Despair</div>
            </div>
 
-           <!-- Memory 17 (Final) -->
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/4b99d97f77c19/final.large.jpg" alt="Zelda's Awakening" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Zelda's Awakening</div>
@@ -129,61 +148,51 @@
         </div>
 
         <div class="gallery-grid">
-           <!-- Image 1: SkyWars -->
            <div class="gallery-item reveal">
              <img src="https://cdn.playhive.com/maps/sky_mega_skykingdom.jpg" alt="SkyWars: Sky Kingdom" class="gallery-img" loading="lazy">
              <div class="gallery-caption">SkyWars: Sky Kingdom</div>
            </div>
 
-           <!-- Image 2: BedWars -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2025/12/KeyArtV2.png" alt="BedWars: Season 4" class="gallery-img" loading="lazy">
              <div class="gallery-caption">BedWars: Season 4</div>
            </div>
 
-           <!-- Image 3: Survival Games -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2019/06/ghost-header-1.jpg" alt="Survival Games" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Survival Games</div>
            </div>
 
-           <!-- Image 4: Treasure Wars -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2018/11/card2-1.png" alt="Treasure Wars: Duos" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Treasure Wars: Duos</div>
            </div>
 
-           <!-- Image 5: Murder Mystery -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2019/03/Promo-Art-1.jpg" alt="Murder Mystery" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Murder Mystery</div>
            </div>
 
-           <!-- Image 6: Just Build -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2020/03/Just-Build-1.jpg" alt="Just Build" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Just Build</div>
            </div>
 
-           <!-- Image 7: Hide and Seek -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2023/08/hide-and-seek-summer.jpg" alt="Hide and Seek" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Hide and Seek</div>
            </div>
 
-           <!-- Image 8: Gravity -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2023/06/image--1-.png" alt="Gravity" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Gravity</div>
            </div>
 
-           <!-- Image 9: Block Party -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2023/01/npc.jpg" alt="Block Party" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Block Party</div>
            </div>
 
-           <!-- Image 10: The Hive -->
            <div class="gallery-item reveal">
              <img src="https://playhive.com/content/images/size/w600/2018/10/Final_v2.1321.Still030.png" alt="The Hive: Bedrock Edition" class="gallery-img" loading="lazy">
              <div class="gallery-caption">The Hive: Bedrock Edition</div>
@@ -228,11 +237,56 @@
   <script>
     // Initialize the background with Blue Ether Palette
     document.addEventListener('DOMContentLoaded', () => {
-      new LiquidEther(document.getElementById('liquid-ether-bg'), {
-        colors: ['#000000', '#0f172a', '#3b82f6', '#1d4ed8'], // Blue Palette
-        mouseForce: 25,
-        cursorSize: 80,
-        autoDemo: true
+      if (typeof LiquidEther !== 'undefined') {
+        new LiquidEther(document.getElementById('liquid-ether-bg'), {
+          colors: ['#000000', '#0f172a', '#3b82f6', '#1d4ed8'], // Blue Palette
+          mouseForce: 25,
+          cursorSize: 80,
+          autoDemo: true
+        });
+      }
+
+      // --- IMPROVISED SCROLL ANIMATIONS ---
+      gsap.registerPlugin(ScrollTrigger);
+
+      // 1. Animate Section Headers smoothly upwards
+      gsap.utils.toArray('.section-header.reveal').forEach(header => {
+        gsap.fromTo(header, 
+          { autoAlpha: 0, y: 40 }, // autoAlpha handles opacity & visibility
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: header,
+              start: "top 85%", // Triggers when the top of the header hits 85% down the viewport
+              toggleActions: "play none none reverse" // Reverses if you scroll back up
+            }
+          }
+        );
+      });
+
+      // 2. Stagger animate the Gallery Images so they pop in one after another
+      gsap.utils.toArray('.gallery-grid').forEach(grid => {
+        const items = grid.querySelectorAll('.gallery-item.reveal');
+        
+        gsap.fromTo(items, 
+          { autoAlpha: 0, y: 50, scale: 0.95 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            stagger: 0.1, // This creates the beautiful cascading effect
+            ease: "back.out(1.2)", // Gives it a tiny, satisfying bounce
+            scrollTrigger: {
+              trigger: grid,
+              start: "top 80%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
       });
     });
   </script>
