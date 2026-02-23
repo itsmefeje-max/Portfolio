@@ -16,30 +16,56 @@
     .gallery-item {
       overflow: hidden;
       border-radius: 12px;
-      transition: box-shadow 0.4s ease;
-      /* Initial state for GSAP animation */
+      transition: box-shadow 0.4s ease, transform 0.4s ease;
       opacity: 0; 
       visibility: hidden;
+      background: #0f172a; 
     }
 
     .gallery-item:hover {
-      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.25); /* Subtle blue glow matching your palette */
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.35); 
+      transform: translateY(-5px); 
     }
 
     .gallery-item .gallery-img {
       transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
+      aspect-ratio: 16/9; 
     }
 
     .gallery-item:hover .gallery-img {
-      transform: scale(1.06);
+      transform: scale(1.08);
     }
     
     .section-header.reveal {
       opacity: 0;
       visibility: hidden;
+    }
+
+    /* --- Aesthetic Text Highlights --- */
+    .highlight-name {
+      color: #22d3ee; /* Vibrant Cyan */
+      font-weight: 600;
+      text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+    }
+
+    .highlight-game {
+      color: #fbbf24; /* Warm Gold */
+      font-weight: 600;
+    }
+
+    .highlight-date {
+      color: #93c5fd; /* Soft Light Blue */
+      font-style: italic;
+    }
+    
+    .section-header p {
+      line-height: 1.7;
+      color: #e2e8f0;
+      font-size: 1.05rem;
     }
   </style>
 </head>
@@ -70,9 +96,10 @@
   <main>
     <section id="gallery" class="section-padding" style="padding-top: 150px; min-height: 80vh;">
       <div class="container">
+        
         <div class="section-header reveal">
           <h2>Game Gallery</h2>
-          <p>A collection of The Legend of Zelda: Breath of the Wild Captured Memories this game is one of my top favourites and i used to play this on a Nintendo Switch with "Mark Dhansen" i currently play it on my laptop emulator - February 24 2026 </p>
+          <p>A collection of captured memories from <span class="highlight-game">The Legend of Zelda: Breath of the Wild</span>. This is one of my all-time favorite games. I originally played it on the Nintendo Switch alongside <span class="highlight-name">Mark Dhansen</span>, and I currently enjoy playing it on my laptop emulator. — <span class="highlight-date">February 24, 2026</span></p>
         </div>
 
         <div class="gallery-grid">
@@ -80,122 +107,101 @@
              <img src="https://images.nintendolife.com/6ab1a7069b9cf/2017032012061100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Subdued Ceremony" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Subdued Ceremony</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/e7ac5ae31f79c/2017032012061400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Resolve and Grief" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Resolve and Grief</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/a1832a2a17367/2017032012061600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Zelda's Resentment" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Zelda's Resentment</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/019b65df93816/2017032012061900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Blades of the Yiga" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Blades of the Yiga</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/0802b6803f51d/2017032012062100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="A Premonition" class="gallery-img" loading="lazy">
              <div class="gallery-caption">A Premonition</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/3cfe5dff30b59/2017032012062400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Silent Princess" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Silent Princess</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/e27338713842b/2017032012062600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Shelter from the Storm" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Shelter from the Storm</div>
            </div>
-
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/ddb5b64be8b4e/2017032012062900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Father and Daughter" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Father and Daughter</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/162c0e3669ce3/2017032012063100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Slumbering Power" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Slumbering Power</div>
            </div>
-           
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/385c9f3e5a956/2017032012063400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="To Mount Lanayru" class="gallery-img" loading="lazy">
              <div class="gallery-caption">To Mount Lanayru</div>
            </div>
-
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/93e7be8681662/2017032012063600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Return of Calamity Ganon" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Return of Calamity Ganon</div>
            </div>
-
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/9bd7196d2a703/2017032012063900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Despair" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Despair</div>
            </div>
-
            <div class="gallery-item reveal">
              <img src="https://images.nintendolife.com/4b99d97f77c19/final.large.jpg" alt="Zelda's Awakening" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Zelda's Awakening</div>
            </div>
         </div>
 
-        <div class="section-header reveal" style="margin-top: 80px;">
+        <div class="section-header reveal" style="margin-top: 100px;">
           <h2>The Hive Minecraft: Bedrock Edition</h2>
-          <p>Minecraft Hive. is a server i still currently play to play. 2021 or 2022 -present, it carries alot of memories</p>
+          <p><span class="highlight-game">The Hive</span> is a Minecraft server I still actively play today. Spanning from <span class="highlight-date">2021</span> to the present, it holds countless great memories for me across all of its unique minigames.</p>
         </div>
 
         <div class="gallery-grid">
            <div class="gallery-item reveal">
-             <img src="https://cdn.playhive.com/maps/sky_mega_skykingdom.jpg" alt="SkyWars: Sky Kingdom" class="gallery-img" loading="lazy">
-             <div class="gallery-caption">SkyWars: Sky Kingdom</div>
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/15442194110118279468" alt="SkyWars" class="gallery-img" loading="lazy">
+             <div class="gallery-caption">SkyWars</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2025/12/KeyArtV2.png" alt="BedWars: Season 4" class="gallery-img" loading="lazy">
-             <div class="gallery-caption">BedWars: Season 4</div>
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/11479512075598977236" alt="BedWars" class="gallery-img" loading="lazy">
+             <div class="gallery-caption">BedWars</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2019/06/ghost-header-1.jpg" alt="Survival Games" class="gallery-img" loading="lazy">
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/4078425250444440745" alt="Survival Games" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Survival Games</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2018/11/card2-1.png" alt="Treasure Wars: Duos" class="gallery-img" loading="lazy">
-             <div class="gallery-caption">Treasure Wars: Duos</div>
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/1095647554984982905" alt="Treasure Wars" class="gallery-img" loading="lazy">
+             <div class="gallery-caption">Treasure Wars</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2019/03/Promo-Art-1.jpg" alt="Murder Mystery" class="gallery-img" loading="lazy">
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/7107798111315238267" alt="Murder Mystery" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Murder Mystery</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2020/03/Just-Build-1.jpg" alt="Just Build" class="gallery-img" loading="lazy">
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/8396820550735582075" alt="Just Build" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Just Build</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2023/08/hide-and-seek-summer.jpg" alt="Hide and Seek" class="gallery-img" loading="lazy">
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/15053805634445006213" alt="Hide and Seek" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Hide and Seek</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2023/06/image--1-.png" alt="Gravity" class="gallery-img" loading="lazy">
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/15258993252283447735" alt="Gravity" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Gravity</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2023/01/npc.jpg" alt="Block Party" class="gallery-img" loading="lazy">
-             <div class="gallery-caption">Block Party</div>
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/9829913396054200578" alt="Block Drop" class="gallery-img" loading="lazy">
+             <div class="gallery-caption">Block Drop</div>
            </div>
-
            <div class="gallery-item reveal">
-             <img src="https://playhive.com/content/images/size/w600/2018/10/Final_v2.1321.Still030.png" alt="The Hive: Bedrock Edition" class="gallery-img" loading="lazy">
-             <div class="gallery-caption">The Hive: Bedrock Edition</div>
+             <img src="http://googleusercontent.com/image_collection/image_retrieval/2776262334045880028" alt="DeathRun" class="gallery-img" loading="lazy">
+             <div class="gallery-caption">DeathRun</div>
            </div>
         </div>
       </div>
@@ -207,7 +213,7 @@
         <div class="footer-bottom">
         <p>&copy; <span id="year"></span> Fejelude Von O. Laxamana. Personal Website.</p>
         <div class="footer-links">
-            <a href="https://www.fejelude.xyz/" target="_blank">Website Updated Recently on February 22, 2026 </a>
+            <a href="https://www.fejelude.xyz/" target="_blank">Website Updated Recently on February 24, 2026 </a>
         </div>
         </div>
     </div>
@@ -224,7 +230,6 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
@@ -235,24 +240,24 @@
   <script src="gallery.js"></script>
 
   <script>
-    // Initialize the background with Blue Ether Palette
     document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Background
       if (typeof LiquidEther !== 'undefined') {
         new LiquidEther(document.getElementById('liquid-ether-bg'), {
-          colors: ['#000000', '#0f172a', '#3b82f6', '#1d4ed8'], // Blue Palette
+          colors: ['#000000', '#0f172a', '#3b82f6', '#1d4ed8'], 
           mouseForce: 25,
           cursorSize: 80,
           autoDemo: true
         });
       }
 
-      // --- IMPROVISED SCROLL ANIMATIONS ---
+      // Initialize Scroll Animations
       gsap.registerPlugin(ScrollTrigger);
 
-      // 1. Animate Section Headers smoothly upwards
+      // Section Headers Fade & Lift
       gsap.utils.toArray('.section-header.reveal').forEach(header => {
         gsap.fromTo(header, 
-          { autoAlpha: 0, y: 40 }, // autoAlpha handles opacity & visibility
+          { autoAlpha: 0, y: 40 },
           {
             autoAlpha: 1,
             y: 0,
@@ -260,14 +265,14 @@
             ease: "power3.out",
             scrollTrigger: {
               trigger: header,
-              start: "top 85%", // Triggers when the top of the header hits 85% down the viewport
-              toggleActions: "play none none reverse" // Reverses if you scroll back up
+              start: "top 85%",
+              toggleActions: "play none none reverse"
             }
           }
         );
       });
 
-      // 2. Stagger animate the Gallery Images so they pop in one after another
+      // Gallery Grid Stagger Effect
       gsap.utils.toArray('.gallery-grid').forEach(grid => {
         const items = grid.querySelectorAll('.gallery-item.reveal');
         
@@ -278,8 +283,8 @@
             y: 0,
             scale: 1,
             duration: 0.8,
-            stagger: 0.1, // This creates the beautiful cascading effect
-            ease: "back.out(1.2)", // Gives it a tiny, satisfying bounce
+            stagger: 0.1, 
+            ease: "back.out(1.2)", 
             scrollTrigger: {
               trigger: grid,
               start: "top 80%",
