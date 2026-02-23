@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const galleryItems = document.querySelectorAll('.gallery-item img');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = lightbox.querySelector('.lightbox-content');
+  const lightboxCaption = lightbox.querySelector('.lightbox-caption');
   const closeBtn = lightbox.querySelector('.lightbox-close');
   const prevBtn = lightbox.querySelector('.lightbox-prev');
   const nextBtn = lightbox.querySelector('.lightbox-next');
@@ -33,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const img = galleryItems[currentIndex];
     lightboxImg.src = img.src;
     lightboxImg.alt = img.alt;
+    if (lightboxCaption) {
+      lightboxCaption.textContent = img.alt;
+    }
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden'; // Prevent scrolling
   };
@@ -48,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const img = galleryItems[currentIndex];
       lightboxImg.src = img.src;
       lightboxImg.alt = img.alt;
+      if (lightboxCaption) {
+        lightboxCaption.textContent = img.alt;
+      }
       gsap.to(lightboxImg, { opacity: 1, duration: 0.2 });
     }});
   };
