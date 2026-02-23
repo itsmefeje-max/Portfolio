@@ -44,6 +44,7 @@
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <div id="liquid-ether-bg"></div>
 
@@ -53,21 +54,21 @@
         <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center;"><span id="nav-logo-text">Itsmefeje</span></a>
       </div>
 
-      <button class="mobile-toggle" aria-label="Toggle Menu">
+      <button class="mobile-toggle" aria-label="Toggle Menu" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
 
-      <nav class="nav-links">
+      <nav class="nav-links" id="nav-links">
         <a href="index.html#about">About</a>
         <a href="index.html#learning">Learning</a>
         <a href="index.html#goals">Goals</a>
-        <a href="Gallery.html" style="color: white; font-weight: 600;">Gallery</a>
+        <a href="Gallery.html" class="active" aria-current="page">Gallery</a>
         <a href="index.html#contact" class="btn-primary">Contact</a>
       </nav>
     </div>
   </header>
 
-  <main>
+  <main id="main-content">
     <section id="gallery" class="section-padding" style="padding-top: 150px; min-height: 80vh;">
       <div class="container">
         <div class="section-header reveal">

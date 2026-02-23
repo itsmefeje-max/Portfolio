@@ -92,6 +92,48 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileBtn.addEventListener('click', () => toggleMobileMenu(false));
   }
 
+  // Close mobile menu on Esc key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      toggleMobileMenu(true);
+    }
+  });
+
+  // Active Navigation Link Highlighting
+  const sections = document.querySelectorAll('section[id]');
+  const navLinksList = document.querySelectorAll('.nav-links a');
+
+  if (sections.length && 'IntersectionObserver' in window) {
+    const navObserverOptions = {
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: 0
+    };
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const activeId = entry.target.id;
+          navLinksList.forEach((link) => {
+            const href = link.getAttribute('href');
+            // Check if link matches the current section ID
+            const isMatch = href.includes('#' + activeId) ||
+                           (activeId === 'gallery' && href.includes('Gallery.html'));
+
+            if (isMatch) {
+              link.classList.add('active');
+              link.setAttribute('aria-current', activeId === 'gallery' ? 'page' : 'location');
+            } else {
+              link.classList.remove('active');
+              link.removeAttribute('aria-current');
+            }
+          });
+        }
+      });
+    }, navObserverOptions);
+
+    sections.forEach((section) => navObserver.observe(section));
+  }
+
   const yearSpan = document.getElementById('year');
   if (yearSpan) {
     yearSpan.textContent = String(new Date().getFullYear());

@@ -157,8 +157,26 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
 .nav-links a {
   text-decoration: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;
   transition: color 0.2s;
+  position: relative;
 }
-.nav-links a:hover { color: white; }
+.nav-links a:hover, .nav-links a.active { color: white; }
+
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+  animation: nav-reveal 0.3s ease-out forwards;
+}
+
+@keyframes nav-reveal {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
 
 .btn-primary {
   background: rgba(255,255,255,0.1);
