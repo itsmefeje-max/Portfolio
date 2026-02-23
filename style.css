@@ -93,9 +93,19 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
   text-decoration: none;
 }
 
+.special-header-effect {
+  text-shadow: 0 0 20px rgba(167, 139, 250, 0.6), 0 0 40px rgba(167, 139, 250, 0.3);
+  animation: shine 3s linear infinite, float-pulse 6s ease-in-out infinite;
+}
+
 @keyframes shine {
   0% { background-position: 100%; }
   100% { background-position: -100%; }
+}
+
+@keyframes float-pulse {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.02); }
 }
 
 @keyframes pulse {
