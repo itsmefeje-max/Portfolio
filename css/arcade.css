@@ -152,3 +152,223 @@ h1.arcade-title {
     padding: 8px;
   }
 }
+
+/* --- ARCADE HUB --- */
+#arcade-hub-ui {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(8px);
+  color: white;
+  transition: opacity 0.5s ease;
+}
+
+#arcade-hub-ui.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hub-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.hub-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  background: linear-gradient(to right, #fff, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+.hub-subtitle {
+  color: #94a3b8;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hub-grid {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 24px;
+}
+
+.hub-card {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  width: 350px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.hub-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: #a78bfa;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.card-preview {
+  height: 180px;
+  background: radial-gradient(circle at center, #1e1b4b, #020617);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.card-content {
+  padding: 24px;
+  text-align: center;
+}
+
+.card-content h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.card-content p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  min-height: 60px;
+}
+
+.btn-launch {
+  background: transparent;
+  border: 1px solid #a78bfa;
+  color: #a78bfa;
+  padding: 10px 24px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  border-radius: 4px; /* Square per preference */
+}
+
+.hub-card:hover .btn-launch {
+  background: #a78bfa;
+  color: #000;
+}
+
+.hub-footer {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-back {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.btn-back:hover {
+  color: white;
+}
+
+/* --- SIMULATION UI --- */
+#simulation-ui {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 30;
+  pointer-events: none; /* Let clicks pass to canvas */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#simulation-ui.hidden {
+    display: none !important;
+}
+
+/* Top Bar */
+.sim-top-bar {
+  pointer-events: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sim-info {
+  font-family: 'Space Grotesk', sans-serif;
+  color: white;
+}
+
+.sim-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-right: 8px;
+  letter-spacing: 0.05em;
+}
+
+#sim-title {
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: 0.05em;
+}
+
+.sim-controls {
+  display: flex;
+  gap: 12px;
+}
+
+/* Override existing HUD for unified look */
+.hud-panel {
+  /* Reuse existing classes but ensure they fit */
+  z-index: 35;
+}
+
+/* Adjust HUD placement when inside simulation UI to avoid Top Bar overlap */
+#simulation-ui .hud-top-right,
+#simulation-ui .hud-top-left {
+    top: 90px;
+}
+
+/* Mobile Tweaks */
+@media (max-width: 768px) {
+  .hub-title { font-size: 2rem; }
+  .hub-grid { flex-direction: column; align-items: center; }
+  .hub-card { width: 100%; max-width: 340px; }
+
+  .sim-top-bar { padding: 12px; flex-direction: column; gap: 12px; align-items: stretch; }
+  .sim-controls { justify-content: space-between; }
+  .btn-control { flex: 1; }
+
+  #simulation-ui .hud-top-right,
+  #simulation-ui .hud-top-left {
+      top: 140px; /* More space for stacked mobile top bar */
+  }
+}
