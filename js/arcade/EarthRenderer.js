@@ -13,11 +13,11 @@ export class EarthRenderer {
 
     // Assets
     this.urls = {
-      day: 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-      night: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_lights_2048.png',
-      clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png',
-      normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg',
-      specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg'
+      day: 'assets/textures/earth-blue-marble.jpg',
+      night: 'assets/textures/earth_lights_2048.png',
+      clouds: 'assets/textures/earth_clouds_1024.png',
+      normal: 'assets/textures/earth_normal_2048.jpg',
+      specular: 'assets/textures/earth_specular_2048.jpg'
     };
 
     this.initEarth();
