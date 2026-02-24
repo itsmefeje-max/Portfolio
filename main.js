@@ -92,6 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileBtn.addEventListener('click', () => toggleMobileMenu(false));
   }
 
+  // Close mobile menu on Escape key
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      toggleMobileMenu(true);
+    }
+  });
+
   const yearSpan = document.getElementById('year');
   if (yearSpan) {
     yearSpan.textContent = String(new Date().getFullYear());
@@ -119,6 +126,25 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       section.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    });
+  });
+
+  // Dropdown ARIA state management
+  document.querySelectorAll('.dropdown').forEach(dropdown => {
+    const trigger = dropdown.querySelector('.dropdown-trigger');
+    if (!trigger) return;
+
+    const setExpanded = (expanded) => {
+      trigger.setAttribute('aria-expanded', expanded);
+    };
+
+    dropdown.addEventListener('mouseenter', () => setExpanded('true'));
+    dropdown.addEventListener('mouseleave', () => setExpanded('false'));
+    dropdown.addEventListener('focusin', () => setExpanded('true'));
+    dropdown.addEventListener('focusout', (e) => {
+      if (!dropdown.contains(e.relatedTarget)) {
+        setExpanded('false');
+      }
     });
   });
 

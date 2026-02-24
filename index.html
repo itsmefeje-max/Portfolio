@@ -24,16 +24,19 @@
         </a>
       </div>
       
-      <button class="mobile-toggle" aria-label="Toggle Menu">
+      <button class="mobile-toggle" aria-label="Toggle Menu" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
 
-      <nav class="nav-links">
+      <nav class="nav-links" id="nav-links">
         <a href="#about">About</a>
         <a href="#learning">Learning</a>
         <a href="#goals">Goals</a>
         <div class="dropdown">
-          <a href="Arcade.html" style="cursor: pointer;">Live Simulations</a>
+          <a href="Arcade.html" class="dropdown-trigger" style="cursor: pointer;" aria-haspopup="true" aria-expanded="false">
+            Live Simulations
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </a>
           <div class="dropdown-content">
             <a href="Arcade.html?sim=orbital">Orbital Earth</a>
             <a href="Arcade.html?sim=flight">Flight Operations</a>

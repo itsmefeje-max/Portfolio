@@ -79,16 +79,19 @@
         <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center;"><span id="nav-logo-text">Itsmefeje</span></a>
       </div>
 
-      <button class="mobile-toggle" aria-label="Toggle Menu">
+      <button class="mobile-toggle" aria-label="Toggle Menu" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
 
-      <nav class="nav-links">
+      <nav class="nav-links" id="nav-links">
         <a href="index.html#about">About</a>
         <a href="index.html#learning">Learning</a>
         <a href="index.html#goals">Goals</a>
         <div class="dropdown">
-          <a href="Arcade.html" style="cursor: pointer;">Live Simulations</a>
+          <a href="Arcade.html" class="dropdown-trigger" style="cursor: pointer;" aria-haspopup="true" aria-expanded="false">
+            Live Simulations
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </a>
           <div class="dropdown-content">
             <a href="Arcade.html?sim=orbital">Orbital Earth</a>
             <a href="Arcade.html?sim=flight">Flight Operations</a>
@@ -111,55 +114,55 @@
         </div>
 
         <div class="gallery-grid">
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/6ab1a7069b9cf/2017032012061100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Subdued Ceremony" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Subdued Ceremony</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/e7ac5ae31f79c/2017032012061400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Resolve and Grief" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Resolve and Grief</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/a1832a2a17367/2017032012061600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Zelda's Resentment" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Zelda's Resentment</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/019b65df93816/2017032012061900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Blades of the Yiga" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Blades of the Yiga</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/0802b6803f51d/2017032012062100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="A Premonition" class="gallery-img" loading="lazy">
              <div class="gallery-caption">A Premonition</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/3cfe5dff30b59/2017032012062400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Silent Princess" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Silent Princess</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/e27338713842b/2017032012062600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Shelter from the Storm" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Shelter from the Storm</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/ddb5b64be8b4e/2017032012062900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Father and Daughter" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Father and Daughter</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/162c0e3669ce3/2017032012063100-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Slumbering Power" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Slumbering Power</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/385c9f3e5a956/2017032012063400-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="To Mount Lanayru" class="gallery-img" loading="lazy">
              <div class="gallery-caption">To Mount Lanayru</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/93e7be8681662/2017032012063600-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Return of Calamity Ganon" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Return of Calamity Ganon</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/9bd7196d2a703/2017032012063900-f1c11a22faee3b82f21b330e1b786a39.large.jpg" alt="Despair" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Despair</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://images.nintendolife.com/4b99d97f77c19/final.large.jpg" alt="Zelda's Awakening" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Zelda's Awakening</div>
            </div>
@@ -171,43 +174,43 @@
         </div>
 
         <div class="gallery-grid">
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2024/08/skywars_classic_release.png" alt="SkyWars" class="gallery-img" loading="lazy">
              <div class="gallery-caption">SkyWars</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2025/12/KeyArtV2.png" alt="BedWars" class="gallery-img" loading="lazy">
              <div class="gallery-caption">BedWars</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2019/06/ghost-header-1.jpg" alt="Survival Games" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Survival Games</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2021/11/map.jpg" alt="Treasure Wars" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Treasure Wars</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2024/10/2024-10-04-17-50-08.png" alt="Murder Mystery" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Murder Mystery</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2025/05/build-battle-header.jpg" alt="Just Build" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Just Build</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2023/08/hide-and-seek-summer.jpg" alt="Hide and Seek" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Hide and Seek</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2023/06/image--1-.png" alt="Gravity" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Gravity</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2023/01/npc.jpg" alt="Block Party" class="gallery-img" loading="lazy">
              <div class="gallery-caption">Block Party</div>
            </div>
-           <div class="gallery-item reveal">
+           <div class="gallery-item reveal" tabindex="0" role="button">
              <img src="https://playhive.com/content/images/size/w600/2023/03/hub-2.jpg" alt="The Hive Hub" class="gallery-img" loading="lazy">
              <div class="gallery-caption">The Hive Hub</div>
            </div>
