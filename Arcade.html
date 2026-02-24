@@ -3,157 +3,89 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arcade | Itsmefeje</title>
-  <meta name="description" content="The Arcade - Play simple browser games hinde to Premium pero okay na to' HAHAHA -by Itsmefeje."/>
+  <title>Live Orbital Arcade | Itsmefeje</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/arcade.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <canvas id="network-canvas"></canvas>
-  <div class="vignette"></div>
+  <div id="sim-canvas"></div>
 
-  <header class="glass-nav">
-    <div class="container nav-container">
-      <div class="logo">
-        <a href="/">
-            <span id="nav-logo-text">Itsmefeje</span>
-        </a>
+  <div id="hud">
+
+    <!-- Top Left -->
+    <div class="hud-panel hud-top-left">
+      <h1 class="arcade-title">LIVE ORBITAL ARCADE</h1>
+      <div class="data-row">
+        <span class="data-label">UTC TIME</span>
+        <span class="data-value" id="utc-time">--:--:--</span>
+      </div>
+      <div class="status-bar" id="status-msg">SYSTEM BOOT...</div>
+
+      <div style="margin-top: 15px;">
+        <a href="/" class="btn-control" style="text-decoration:none; padding: 6px 12px; font-size: 0.7rem;">&lt; RETURN HOME</a>
       </div>
     </div>
-  </header>
 
-  <main id="main-content">
-    <section class="hero-section">
-      <div class="hero-content reveal">
-        <div class="status-badge">
-          <span class="pulse-dot"></span>
-          <span>I MISS YOU</span>
-        </div>
-
-        <h1 class="glitch-text" data-text="The Arcade">
-          The <span class="gradient-text">Arcade</span>
-        </h1>
-
-        <p class="hero-sub">
-          Clean, lightweight browser games built to run smoothly on mobile and desktop.
-          Tap or click in instantly and play.
-        </p>
-
-        <div class="cta-row">
-          <a href="/" class="btn-glow">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Return Home
-          </a>
-        </div>
+    <!-- Top Right -->
+    <div class="hud-panel hud-top-right">
+      <div class="data-row">
+        <span class="data-label">OPERATOR</span>
+        <span class="data-value">GUEST</span>
       </div>
-    </section>
-
-    <section class="arcade-section section-padding">
-      <div class="container">
-        <div class="section-header">
-          <h2>Playable Games</h2>
-          <p>Three stable mini-games tuned for crisp controls, fast reloads, and smooth play.</p>
-        </div>
-        <div class="arcade-grid">
-          <article class="arcade-card">
-            <div class="arcade-card-header">
-              <h3>Flappy Bird</h3>
-              <span class="status-pill status-playable">Playable</span>
-            </div>
-            <div class="chip-row">
-              <span>Quick tap</span>
-              <span>Mobile ready</span>
-              <span>Score chase</span>
-            </div>
-            <p>
-              Tap, click, or press space to flap through the pipe gaps.
-            </p>
-            <ul class="arcade-meta">
-              <li><strong>Controls:</strong> Tap/click/space to jump</li>
-              <li><strong>Goal:</strong> Survive and stack score</li>
-            </ul>
-            <div class="game-shell">
-              <div class="game-toolbar">
-                <button class="game-btn" data-game="flappy" data-action="start">Launch</button>
-                <button class="game-btn ghost" data-game="flappy" data-action="reset">Reset</button>
-                <button class="game-btn ghost" data-game="flappy" data-action="tap">Flap</button>
-                <p id="flappy-status" class="game-status">Ready to launch.</p>
-              </div>
-              <canvas id="flappy-game" width="520" height="300" aria-label="Flappy Bird Inspired Block Game "></canvas>
-            </div>
-          </article>
-
-          <article class="arcade-card">
-            <div class="arcade-card-header">
-              <h3>Snake</h3>
-              <span class="status-pill status-playable">Playable</span>
-            </div>
-            <div class="chip-row">
-              <span>Keyboard + touch</span>
-              <span>Swipe support</span>
-              <span>Speed ramp</span>
-            </div>
-            <p>
-              Fast and clean snake with keyboard and touch controls.
-            </p>
-            <ul class="arcade-meta">
-              <li><strong>Controls:</strong> Arrow keys / WASD / touch buttons / swipe</li>
-              <li><strong>Goal:</strong> Eat food and avoid walls or your tail</li>
-            </ul>
-            <div class="game-shell">
-              <div class="game-toolbar">
-                <button class="game-btn" data-game="snake" data-action="start">Launch</button>
-                <button class="game-btn ghost" data-game="snake" data-action="reset">Reset</button>
-                <div class="touch-dpad" role="group" aria-label="Snake touch controls">
-                  <button class="game-btn ghost" data-game="snake" data-action="up">↑</button>
-                  <button class="game-btn ghost" data-game="snake" data-action="left">←</button>
-                  <button class="game-btn ghost" data-game="snake" data-action="down">↓</button>
-                  <button class="game-btn ghost" data-game="snake" data-action="right">→</button>
-                </div>
-                <p id="snake-status" class="game-status">Ready to launch.</p>
-              </div>
-              <canvas id="snake-game" width="520" height="300" aria-label="Snake game"></canvas>
-            </div>
-          </article>
-
-          <article class="arcade-card">
-            <div class="arcade-card-header">
-              <h3>Block Puzzle</h3>
-              <span class="status-pill status-playable">Playable</span>
-            </div>
-            <div class="chip-row">
-              <span>Brain teaser</span>
-              <span>Tap to place</span>
-              <span>Line clears</span>
-            </div>
-            <p>
-              Place blocks on an 8x8 board. Fill full rows or columns to clear.
-            </p>
-            <ul class="arcade-meta">
-              <li><strong>Controls:</strong> Select a piece, then tap/click a grid cell</li>
-              <li><strong>Goal:</strong> Keep placing blocks and clear lines</li>
-            </ul>
-            <div class="game-shell">
-              <div class="game-toolbar">
-                <button class="game-btn" data-game="block" data-action="start">Launch</button>
-                <button class="game-btn ghost" data-game="block" data-action="reset">Reset</button>
-                <p id="block-status" class="game-status">Ready to launch.</p>
-              </div>
-              <canvas id="block-game" width="520" height="360" aria-label="Block Puzzle game"></canvas>
-            </div>
-          </article>
-        </div>
+      <div class="data-row">
+        <span class="data-label">LOCATION</span>
+        <span class="data-value" id="user-loc">SCANNING...</span>
       </div>
-    </section>
-  </main>
+    </div>
 
-  <script src="main.js"></script>
-  <script src="arcade-games.js"></script>
+    <!-- Bottom Left -->
+    <div class="hud-panel hud-bottom-left">
+      <div style="margin-bottom:8px; color:#f472b6; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">ISS TELEMETRY</div>
+      <div class="data-row">
+        <span class="data-label">LATITUDE</span>
+        <span class="data-value" id="iss-lat">0.0000</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">LONGITUDE</span>
+        <span class="data-value" id="iss-lon">0.0000</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">ALTITUDE</span>
+        <span class="data-value" id="iss-alt">0.00 km</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">VELOCITY</span>
+        <span class="data-value" id="iss-vel">0 km/h</span>
+      </div>
+    </div>
+
+    <!-- Bottom Right -->
+    <div class="hud-panel hud-bottom-right">
+      <div class="data-label" style="width:100%; text-align:right; margin-bottom:5px; opacity:0.7;">CAMERA CONTROL</div>
+      <button id="btn-mode-free" class="btn-control">FREE ORBIT</button>
+      <button id="btn-mode-iss" class="btn-control">TRACK ISS</button>
+      <button id="btn-mode-user" class="btn-control">LOCATE USER</button>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/arcade/main.js"></script>
 </body>
 </html>
