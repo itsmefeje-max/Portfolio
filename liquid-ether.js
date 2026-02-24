@@ -947,6 +947,21 @@
         }
       });
 
+      // Performance: Pause when out of viewport
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (Common.clock) Common.clock.start();
+              this.start();
+            } else {
+              this.pause();
+            }
+          });
+        });
+        observer.observe(this.container);
+      }
+
       this.running = false;
     }
 

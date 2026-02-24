@@ -2,16 +2,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // GSAP Entrance Animation
   gsap.registerPlugin(ScrollTrigger);
 
-  gsap.from('.gallery-item', {
-    duration: 0.8,
-    y: 50,
-    opacity: 0,
-    stagger: 0.1,
-    ease: 'power3.out',
-    scrollTrigger: {
-      trigger: '.gallery-grid',
-      start: 'top 90%'
-    }
+  // Section Headers Fade & Lift
+  gsap.utils.toArray('.section-header.reveal').forEach(header => {
+    gsap.fromTo(header,
+      { autoAlpha: 0, y: 40 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: header,
+          start: "top 85%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
+  });
+
+  // Gallery Grid Stagger Effect
+  gsap.utils.toArray('.gallery-grid').forEach(grid => {
+    const items = grid.querySelectorAll('.gallery-item.reveal');
+
+    gsap.fromTo(items,
+      { autoAlpha: 0, y: 50, scale: 0.95 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "back.out(1.2)",
+        scrollTrigger: {
+          trigger: grid,
+          start: "top 80%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
   });
 
   // Lightbox Logic
@@ -103,22 +131,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Swipe Support
     let touchStartX = 0;
     let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
 
     lightbox.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
     }, { passive: true });
 
     lightbox.addEventListener('touchend', (e) => {
       touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
       handleSwipe();
     }, { passive: true });
 
     const handleSwipe = () => {
-      if (touchStartX - touchEndX > 50) {
-        nextImage();
+      const diffX = touchStartX - touchEndX;
+      const diffY = touchStartY - touchEndY;
+
+      // Vertical swipe to close
+      if (Math.abs(diffY) > 50) {
+        closeLightbox();
+        return;
       }
-      if (touchEndX - touchStartX > 50) {
-        prevImage();
+
+      // Horizontal swipe to navigate
+      if (Math.abs(diffX) > 50) {
+        if (diffX > 0) nextImage();
+        else prevImage();
       }
     };
   }

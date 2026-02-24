@@ -135,10 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
       navigator.clipboard.writeText(textToCopy).then(() => {
         const originalText = discordVal.textContent;
         discordVal.textContent = 'Copied!';
+        copyDiscord.classList.add('copied');
         copyDiscord.style.pointerEvents = 'none'; // Prevent double clicks during feedback
 
         setTimeout(() => {
           discordVal.textContent = originalText;
+          copyDiscord.classList.remove('copied');
           copyDiscord.style.pointerEvents = 'auto';
         }, 2000);
       }).catch(err => {
@@ -146,4 +148,41 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // Mobile Dropdown Double-Tap Logic
+  const dropdownParents = document.querySelectorAll('.dropdown');
+
+  dropdownParents.forEach(parent => {
+    const link = parent.querySelector('a');
+    if (!link) return;
+
+    link.addEventListener('click', (e) => {
+      // Check if we are on a touch device or mobile menu is active
+      const isMobile = window.matchMedia('(hover: none)').matches ||
+                       (navLinks && navLinks.classList.contains('active')) ||
+                       ('ontouchstart' in window);
+
+      if (isMobile) {
+        // If not already open, open it and prevent navigation
+        if (!parent.classList.contains('touch-active')) {
+          e.preventDefault();
+
+          // Close other open dropdowns
+          dropdownParents.forEach(d => {
+            if (d !== parent) d.classList.remove('touch-active');
+          });
+
+          parent.classList.add('touch-active');
+        }
+        // Else (if already open), allow default action (navigation)
+      }
+    });
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) {
+      dropdownParents.forEach(d => d.classList.remove('touch-active'));
+    }
+  });
 });
