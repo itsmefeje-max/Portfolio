@@ -71,8 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Event Listeners
   galleryItems.forEach((img, index) => {
-    img.closest('.gallery-item').addEventListener('click', () => {
-      openLightbox(index);
+    const item = img.closest('.gallery-item');
+
+    const triggerLightbox = () => openLightbox(index);
+
+    item.addEventListener('click', triggerLightbox);
+
+    // Keyboard support for gallery items
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        triggerLightbox();
+      }
     });
   });
 

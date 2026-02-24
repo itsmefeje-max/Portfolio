@@ -957,10 +957,26 @@ button.method-card {
   border-top: 1px solid var(--border-light);
 }
 
-.dropdown:hover .dropdown-content {
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
   display: block;
   opacity: 1;
   animation: fadeIn 0.3s forwards;
+}
+
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chevron {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown:hover .chevron,
+.dropdown:focus-within .chevron {
+  transform: rotate(180deg);
 }
 
 .dropdown-content a {
