@@ -39,8 +39,9 @@ export class FlightService {
       if (!states) return;
 
       const newFlights = [];
-      // Limit to 10000 to match mesh size
-      const limit = 10000;
+      // Dynamic limit based on device performance
+      const isMobile = window.innerWidth < 768;
+      const limit = isMobile ? 2500 : 10000;
 
       let count = 0;
       for (const s of states) {

@@ -47,36 +47,39 @@ export class FlightOperationsSimulation {
             </div>
           </div>
 
-          <!-- Bottom Left Flight Info (Hidden initially) -->
-          <div id="flight-info-panel" class="hud-panel hud-bottom-left" style="display:none;">
-            <div style="margin-bottom:8px; color:#38bdf8; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">FLIGHT DATA</div>
-            <div class="data-row">
-              <span class="data-label">FLIGHT ID</span>
-              <span class="data-value" id="f-id">--</span>
+          <!-- Bottom Group -->
+          <div class="hud-bottom-group">
+            <!-- Bottom Left Flight Info (Hidden initially) -->
+            <div id="flight-info-panel" class="hud-panel hud-bottom-left" style="display:none;">
+              <div style="margin-bottom:8px; color:#38bdf8; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">FLIGHT DATA</div>
+              <div class="data-row">
+                <span class="data-label">FLIGHT ID</span>
+                <span class="data-value" id="f-id">--</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">AIRLINE</span>
+                <span class="data-value" id="f-airline">--</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">ALTITUDE</span>
+                <span class="data-value" id="f-alt">--</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">SPEED</span>
+                <span class="data-value" id="f-speed">--</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">HEADING</span>
+                <span class="data-value" id="f-heading">--</span>
+              </div>
+               <button id="btn-close-flight" class="btn-control" style="width:100%; margin-top:15px; background:rgba(255,0,0,0.2); border-color:rgba(255,0,0,0.4);">CLOSE PANEL</button>
             </div>
-            <div class="data-row">
-              <span class="data-label">AIRLINE</span>
-              <span class="data-value" id="f-airline">--</span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">ALTITUDE</span>
-              <span class="data-value" id="f-alt">--</span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">SPEED</span>
-              <span class="data-value" id="f-speed">--</span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">HEADING</span>
-              <span class="data-value" id="f-heading">--</span>
-            </div>
-             <button id="btn-close-flight" class="btn-control" style="width:100%; margin-top:15px; background:rgba(255,0,0,0.2); border-color:rgba(255,0,0,0.4);">CLOSE PANEL</button>
-          </div>
 
-           <!-- Bottom Right Camera -->
-          <div class="hud-panel hud-bottom-right">
-            <div class="data-label" style="width:100%; text-align:right; margin-bottom:5px; opacity:0.7;">CAMERA CONTROL</div>
-            <button id="btn-mode-free" class="btn-control">FREE ORBIT</button>
+             <!-- Bottom Right Camera -->
+            <div class="hud-panel hud-bottom-right">
+              <div class="data-label" style="width:100%; text-align:right; margin-bottom:5px; opacity:0.7;">CAMERA CONTROL</div>
+              <button id="btn-mode-free" class="btn-control">FREE ORBIT</button>
+            </div>
           </div>
         `;
     }

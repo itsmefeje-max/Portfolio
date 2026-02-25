@@ -18,6 +18,10 @@ export class CameraDirector {
     this.targetVec = new THREE.Vector3();
   }
 
+  setTarget(vec) {
+      if (vec) this.targetVec.copy(vec);
+  }
+
   setMode(mode, data) {
     this.mode = mode;
     console.log(`Camera Mode: ${mode}`);
@@ -64,13 +68,15 @@ export class CameraDirector {
     }
   }
 
-  update(issPosVec) {
-    if (this.mode === 'ISS' && issPosVec) {
-        // Softly follow ISS
-        this.controls.target.lerp(issPosVec, 0.1);
+  update(optionalTarget) {
+    // If a target is passed directly (legacy support or one-off), use it temporarily or update targetVec
+    if (optionalTarget) this.targetVec.copy(optionalTarget);
 
-        // Optional: Move camera to maintain relative offset?
-        // For now, just tracking the target allows the user to rotate around the ISS.
+    if (this.mode === 'ISS') {
+        // Softly follow target using the internal targetVec which is updated by the simulation
+        if (this.targetVec.lengthSq() > 0) {
+            this.controls.target.lerp(this.targetVec, 0.1);
+        }
     }
 
     this.controls.update();

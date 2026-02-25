@@ -79,34 +79,37 @@ export class OrbitalEarthSimulation {
             </div>
           </div>
 
-          <!-- Bottom Left -->
-          <div class="hud-panel hud-bottom-left">
-            <div style="margin-bottom:8px; color:#f472b6; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">ISS TELEMETRY</div>
-            <div class="data-row">
-              <span class="data-label">LATITUDE</span>
-              <span class="data-value" id="iss-lat">0.0000</span>
+          <!-- Bottom Group (Unified Sheet on Mobile) -->
+          <div class="hud-bottom-group">
+            <!-- Bottom Left -->
+            <div class="hud-panel hud-bottom-left">
+              <div style="margin-bottom:8px; color:#f472b6; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">ISS TELEMETRY</div>
+              <div class="data-row">
+                <span class="data-label">LATITUDE</span>
+                <span class="data-value" id="iss-lat">0.0000</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">LONGITUDE</span>
+                <span class="data-value" id="iss-lon">0.0000</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">ALTITUDE</span>
+                <span class="data-value" id="iss-alt">0.00 km</span>
+              </div>
+              <div class="data-row">
+                <span class="data-label">VELOCITY</span>
+                <span class="data-value" id="iss-vel">0 km/h</span>
+              </div>
+               <div class="status-bar" id="status-msg">SYSTEM ONLINE</div>
             </div>
-            <div class="data-row">
-              <span class="data-label">LONGITUDE</span>
-              <span class="data-value" id="iss-lon">0.0000</span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">ALTITUDE</span>
-              <span class="data-value" id="iss-alt">0.00 km</span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">VELOCITY</span>
-              <span class="data-value" id="iss-vel">0 km/h</span>
-            </div>
-             <div class="status-bar" id="status-msg">SYSTEM ONLINE</div>
-          </div>
 
-          <!-- Bottom Right -->
-          <div class="hud-panel hud-bottom-right">
-            <div class="data-label" style="width:100%; text-align:right; margin-bottom:5px; opacity:0.7;">CAMERA CONTROL</div>
-            <button id="btn-mode-free" class="btn-control">FREE ORBIT</button>
-            <button id="btn-mode-iss" class="btn-control">TRACK ISS</button>
-            <button id="btn-mode-user" class="btn-control">LOCATE USER</button>
+            <!-- Bottom Right -->
+            <div class="hud-panel hud-bottom-right">
+              <div class="data-label" style="width:100%; text-align:right; margin-bottom:5px; opacity:0.7;">CAMERA CONTROL</div>
+              <button id="btn-mode-free" class="btn-control">FREE ORBIT</button>
+              <button id="btn-mode-iss" class="btn-control">TRACK ISS</button>
+              <button id="btn-mode-user" class="btn-control">LOCATE USER</button>
+            </div>
           </div>
         `;
     }
@@ -208,45 +211,7 @@ export class OrbitalEarthSimulation {
     if (this.cameraDirector.mode === 'ISS') {
         const issWorldPos = new THREE.Vector3();
         this.issMarker.getWorldPosition(issWorldPos);
-
-        // We need to tell camera director to look at this
-        // But CameraDirector.update() uses its own logic.
-        // We should pass the target.
-        // In my CameraDirector implementation, update(issPosVec) handles it.
-        this.cameraDirector.update(issWorldPos);
-    } else {
-        // Pass null or nothing
-        // this.cameraDirector.update(); // Called in ArcadeSystem main loop
-        // Wait, ArcadeSystem calls cameraDirector.update() without args.
-        // I need to hook into that or update it here.
-        // If I update it here, I might double update.
-        // BUT CameraDirector.update() takes `issPosVec`.
-        // So I should probably set a target on CameraDirector instead of passing it every frame?
-        // Or modify ArcadeSystem to ask the active sim for the camera target.
-
-        // Let's modify ArcadeSystem logic slightly:
-        // ArcadeSystem calls activeSim.update()
-        // activeSim responsible for setting camera target?
-
-        // For now, I'll direct the camera here since I have the reference.
-        // But ArcadeSystem calls it too.
-        // Let's fix this in ArcadeSystem: "this.cameraDirector.update();"
-        // I should probably remove the call in ArcadeSystem OR ensure it doesn't conflict.
-
-        // Actually, in `OrbitalEarthSimulation.update()`, I can just set the target on the director property if needed.
-        // `CameraDirector.update(issWorldPos)` uses the argument for lerping.
-
-        // I'll manually call update with the target here, and ArcadeSystem's call without args will just update controls.
-        // Wait, `CameraDirector.update(issPosVec)`:
-        // if (mode === 'ISS' && issPosVec) controls.target.lerp(issPosVec)
-
-        // If ArcadeSystem calls update(), issPosVec is undefined.
-        // If I call update(issWorldPos) here, it lerps.
-        // So I should call it here.
-
-        const issWorldPos = new THREE.Vector3();
-        this.issMarker.getWorldPosition(issWorldPos);
-        this.cameraDirector.update(issWorldPos);
+        this.cameraDirector.setTarget(issWorldPos);
     }
   }
 
