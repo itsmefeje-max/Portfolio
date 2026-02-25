@@ -137,7 +137,7 @@ export class FlightOperationsSimulation {
 
     const material = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
 
-    const count = 3500;
+    const count = 10000;
     this.mesh = new THREE.InstancedMesh(geometry, material, count);
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 

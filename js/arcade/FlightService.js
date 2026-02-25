@@ -1,99 +1,135 @@
-
 export class FlightService {
   constructor() {
     this.flights = [];
     this.lastUpdate = Date.now();
+    this.lastFetch = 0;
+    this.FETCH_INTERVAL = 20000; // 20 seconds
+    this.isFetching = false;
     this.init();
   }
 
   init() {
-    // Generate mock flights
-    const count = 3000;
-    const hubs = [
-        { lat: 40.7128, lon: -74.0060 }, // NYC
-        { lat: 51.5074, lon: -0.1278 }, // London
-        { lat: 35.6762, lon: 139.6503 }, // Tokyo
-        { lat: 25.2048, lon: 55.2708 }, // Dubai
-        { lat: -33.8688, lon: 151.2093 }, // Sydney
-        { lat: 48.8566, lon: 2.3522 }, // Paris
-        { lat: 34.0522, lon: -118.2437 }, // LA
-        { lat: 1.3521, lon: 103.8198 }, // Singapore
-        { lat: 55.7558, lon: 37.6173 }, // Moscow
-        { lat: -23.5505, lon: -46.6333 }, // Sao Paulo
-        { lat: 22.3193, lon: 114.1694 }, // Hong Kong
-        { lat: 50.1109, lon: 8.6821 }, // Frankfurt
-        { lat: 39.9042, lon: 116.4074 }, // Beijing
-        { lat: 19.4326, lon: -99.1332 }, // Mexico City
-        { lat: 28.6139, lon: 77.2090 }  // New Delhi
-    ];
+     this.fetchFlights();
+  }
 
-    for(let i=0; i<count; i++) {
-        const hub = hubs[Math.floor(Math.random() * hubs.length)];
-        // Random spread from hub (Gaussian-ish)
-        const lat = hub.lat + (Math.random() - 0.5) * 120 * Math.random();
-        const lon = hub.lon + (Math.random() - 0.5) * 120 * Math.random();
+  async fetchFlights() {
+    const now = Date.now();
+    // Prevent overlapping fetches or too frequent fetches
+    if (this.isFetching || (now - this.lastFetch < this.FETCH_INTERVAL && this.flights.length > 0)) {
+        return;
+    }
 
-        this.flights.push({
-            id: `FL${Math.floor(Math.random()*9000)+1000}`,
-            lat: lat,
-            lon: lon,
-            alt: 8000 + Math.random() * 4000, // 8-12km
-            speed: 700 + Math.random() * 300, // km/h
-            heading: Math.random() * 360,
-            origin: "UNK",
-            dest: "UNK",
-            airline: this.getRandomAirline()
-        });
+    this.isFetching = true;
+    try {
+        const response = await fetch('https://opensky-network.org/api/states/all');
+        if (!response.ok) {
+            throw new Error(`OpenSky API Error: ${response.status}`);
+        }
+        const data = await response.json();
+        this.processData(data.states);
+        this.lastFetch = Date.now();
+    } catch (error) {
+        console.error("FlightService Fetch Error:", error);
+    } finally {
+        this.isFetching = false;
     }
   }
 
-  getRandomAirline() {
-      const airlines = ["American", "Delta", "United", "British Airways", "Lufthansa", "Emirates", "ANA", "Singapore", "Qantas", "Air France"];
-      return airlines[Math.floor(Math.random() * airlines.length)];
+  processData(states) {
+      if (!states) return;
+
+      const newFlights = [];
+      // Limit to 10000 to match mesh size
+      const limit = 10000;
+
+      let count = 0;
+      for (const s of states) {
+          if (count >= limit) break;
+
+          // s[0]: icao24 (string)
+          // s[1]: callsign (string)
+          // s[5]: longitude (float)
+          // s[6]: latitude (float)
+          // s[7]: baro_altitude (float)
+          // s[8]: on_ground (boolean)
+          // s[9]: velocity (float)
+          // s[10]: true_track (float)
+          // s[13]: geo_altitude (float)
+
+          // Filter on_ground
+          if (s[8]) continue;
+
+          // Check coordinates
+          if (s[5] === null || s[6] === null) continue;
+
+          const icao = s[0];
+          const callsign = s[1] ? s[1].trim() : icao;
+          const lat = s[6];
+          const lon = s[5];
+          const alt = s[7] !== null ? s[7] : s[13];
+          const speed = s[9] !== null ? s[9] * 3.6 : 0; // m/s to km/h
+          const heading = s[10] !== null ? s[10] : 0;
+
+          if (alt === null) continue;
+
+          // Use callsign (or icao) as the airline identifier to replace fake names
+          const airline = callsign || icao;
+
+          // Use callsign or icao as ID
+          const id = callsign || icao;
+
+          newFlights.push({
+              id: id,
+              lat: lat,
+              lon: lon,
+              alt: alt,
+              speed: speed,
+              heading: heading,
+              airline: airline
+          });
+          count++;
+      }
+      this.flights = newFlights;
   }
 
   getFlights() {
     const now = Date.now();
-    // Always update if requested, assuming 60fps loop calls this
-    // But maybe throttle to avoid heavy calc?
-    // InstancedMesh update is heavy if count is high.
-    // The prompt says "Update interval: 5–10 seconds." for *retrieval*.
-    // Movement: "Interpolated smoothly."
-    // So I should update positions every frame for smooth movement.
 
-    if (now - this.lastUpdate > 16) { // ~60fps cap
-        const dt = (now - this.lastUpdate) / 1000; // seconds
+    // Trigger fetch if needed
+    if (now - this.lastFetch > this.FETCH_INTERVAL) {
+        this.fetchFlights();
+    }
+
+    // Interpolate
+    // Only update if time passed
+    if (now - this.lastUpdate > 16) {
+        const dt = (now - this.lastUpdate) / 1000;
         this.updateFlights(dt);
         this.lastUpdate = now;
     }
+
     return this.flights;
   }
 
   updateFlights(dt) {
-    // Simple movement: lat/lon change based on heading/speed
-    // 1 deg lat ~ 111km.
-    // Speed in km/h -> km/s = speed / 3600
+      for(const f of this.flights) {
+        // Simple linear extrapolation
+        // 1 deg lat ~ 111km
+        const dist = (f.speed / 3600) * dt; // km
+        const distDeg = dist / 111;
 
-    for(const f of this.flights) {
-        const dist = (f.speed / 3600) * dt; // distance in km
-        const distDeg = dist / 111; // rough degree change
-
-        const rad = (90 - f.heading) * (Math.PI / 180); // Math angle (0=East) vs Nav (0=North)
-        // Nav 0 (N) -> Math 90
-        // Nav 90 (E) -> Math 0
-        // Nav 180 (S) -> Math -90
-
+        const rad = (90 - f.heading) * (Math.PI / 180);
         const dLat = distDeg * Math.sin(rad);
-        const dLon = distDeg * Math.cos(rad); // simplified
+        const dLon = distDeg * Math.cos(rad);
 
         f.lat += dLat;
-        f.lon += dLon; // This will distort near poles but okay for visual
+        f.lon += dLon;
 
         // Wrap around
         if (f.lon > 180) f.lon -= 360;
         if (f.lon < -180) f.lon += 360;
         if (f.lat > 90) f.lat = 90 - (f.lat - 90);
         if (f.lat < -90) f.lat = -90 - (f.lat + 90);
-    }
+      }
   }
 }
