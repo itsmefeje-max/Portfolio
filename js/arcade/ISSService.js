@@ -51,20 +51,18 @@ export class ISSService {
     // Extrapolate
     const ratio = timeSinceLast / dt;
 
-    // Clamp extrapolation to avoid wild jumps if network is down for too long
-    // (e.g., if ratio > 2, stop moving or move very slowly)
-    if (ratio > 5.0) {
-        return pLast; // Stop predicting if data is stale (> 25s)
-    }
+    // Clamp extrapolation to avoid wild jumps if network is down for too long.
+    // Instead of snapping back, we cap the ratio so the object stops at the last valid prediction.
+    const effectiveRatio = Math.min(ratio, 5.0);
 
     // Unwind longitude for correct wrapping
     let dLon = pLast.lon - pPrev.lon;
     if (dLon > 180) dLon -= 360;
     if (dLon < -180) dLon += 360;
 
-    let lat = pLast.lat + (pLast.lat - pPrev.lat) * ratio;
-    let lon = pLast.lon + dLon * ratio;
-    let alt = pLast.alt + (pLast.alt - pPrev.alt) * ratio;
+    let lat = pLast.lat + (pLast.lat - pPrev.lat) * effectiveRatio;
+    let lon = pLast.lon + dLon * effectiveRatio;
+    let alt = pLast.alt + (pLast.alt - pPrev.alt) * effectiveRatio;
 
     // Wrap longitude result
     if (lon > 180) lon -= 360;

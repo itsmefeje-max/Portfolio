@@ -26,6 +26,15 @@ export class ArcadeSystem {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.set(0, 0, 40);
 
+    // Loading Manager
+    THREE.DefaultLoadingManager.onLoad = () => {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
+        }
+    };
+
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -74,7 +83,16 @@ export class ArcadeSystem {
   }
 
   init() {
-    window.addEventListener('resize', this.onResize);
+    const debounce = (func, wait) => {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    };
+
+    window.addEventListener('resize', debounce(this.onResize, 200));
 
     // Setup UI Listeners
     this.setupUI();

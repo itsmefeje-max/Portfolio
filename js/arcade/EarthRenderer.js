@@ -12,12 +12,13 @@ export class EarthRenderer {
     this.loader = loader;
 
     // Assets
+    const isMobile = window.innerWidth < 768;
     this.urls = {
       day: 'assets/textures/earth-blue-marble.jpg',
       night: 'assets/textures/earth_lights_2048.png',
       clouds: 'assets/textures/earth_clouds_1024.png',
-      normal: 'assets/textures/earth_normal_2048.jpg',
-      specular: 'assets/textures/earth_specular_2048.jpg'
+      normal: isMobile ? null : 'assets/textures/earth_normal_2048.jpg',
+      specular: isMobile ? null : 'assets/textures/earth_specular_2048.jpg'
     };
 
     this.initEarth();
@@ -31,8 +32,8 @@ export class EarthRenderer {
     const geometry = new THREE.SphereGeometry(this.radius, 64, 64);
     const material = new THREE.MeshStandardMaterial({
       map: this.loader.load(this.urls.day),
-      normalMap: this.loader.load(this.urls.normal),
-      roughnessMap: this.loader.load(this.urls.specular),
+      normalMap: this.urls.normal ? this.loader.load(this.urls.normal) : null,
+      roughnessMap: this.urls.specular ? this.loader.load(this.urls.specular) : null,
       roughness: 0.8,
       metalness: 0.1
     });
