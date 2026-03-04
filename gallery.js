@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+window.initGallery = function() {
   // GSAP Entrance Animation
   gsap.registerPlugin(ScrollTrigger);
 
@@ -171,4 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'ArrowRight') nextImage();
     if (e.key === 'ArrowLeft') prevImage();
   });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.initGallery();
 });
