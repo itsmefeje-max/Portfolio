@@ -5,6 +5,7 @@ import { EarthRenderer } from './EarthRenderer.js';
 import { CameraDirector } from './CameraDirector.js';
 import { OrbitalEarthSimulation } from './OrbitalEarthSimulation.js';
 import { FlightOperationsSimulation } from './FlightOperationsSimulation.js';
+import { SolarSystemSimulation } from './SolarSystemSimulation.js';
 
 export class ArcadeSystem {
   constructor() {
@@ -50,10 +51,14 @@ export class ArcadeSystem {
     // Stars
     this.createStars();
 
+    // Global Lighting
+    this.initGlobalLighting();
+
     // Simulations
     this.simulations = {
         'orbital': new OrbitalEarthSimulation(this),
-        'flight': new FlightOperationsSimulation(this)
+        'flight': new FlightOperationsSimulation(this),
+        'solar': new SolarSystemSimulation(this)
     };
 
     // UI Elements
@@ -67,6 +72,13 @@ export class ArcadeSystem {
     this.onResize = this.onResize.bind(this);
 
     this.init();
+  }
+
+  initGlobalLighting() {
+    this.globalSunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+    this.scene.add(this.globalSunLight);
+    this.globalAmbientLight = new THREE.AmbientLight(0x050505);
+    this.scene.add(this.globalAmbientLight);
   }
 
   createStars() {
@@ -170,7 +182,10 @@ export class ArcadeSystem {
 
     // Update Title
     if (this.uiTitle) {
-        this.uiTitle.textContent = key === 'orbital' ? 'ORBITAL EARTH' : 'FLIGHT OPERATIONS';
+        if (key === 'orbital') this.uiTitle.textContent = 'ORBITAL EARTH';
+        else if (key === 'flight') this.uiTitle.textContent = 'FLIGHT OPERATIONS';
+        else if (key === 'solar') this.uiTitle.textContent = 'SOLAR SYSTEM EXPLORER';
+        else this.uiTitle.textContent = 'SIMULATION';
     }
 
     // Mount New Sim
@@ -189,6 +204,11 @@ export class ArcadeSystem {
     const now = this.timeEngine.getUTCTime();
     const gmst = this.timeEngine.getGMST(now);
     const sunPos = this.timeEngine.getSunPosition(now);
+
+    // Update global sunlight position
+    if (sunPos) {
+        this.globalSunLight.position.set(sunPos.x, sunPos.y, sunPos.z);
+    }
 
     // Update Earth
     this.earthRenderer.update(sunPos, gmst);

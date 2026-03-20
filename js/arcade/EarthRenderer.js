@@ -25,7 +25,6 @@ export class EarthRenderer {
     this.initClouds();
     this.initNightLights();
     this.initAtmosphere();
-    this.initSun();
   }
 
   initEarth() {
@@ -146,24 +145,15 @@ export class EarthRenderer {
     this.group.add(this.atmosphereMesh);
   }
 
-  initSun() {
-    this.sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
-    this.scene.add(this.sunLight);
-    this.ambientLight = new THREE.AmbientLight(0x050505);
-    this.scene.add(this.ambientLight);
-  }
-
   update(sunPos, gmst) {
     this.group.rotation.y = gmst;
 
     if (sunPos) {
-        this.sunLight.position.set(sunPos.x, sunPos.y, sunPos.z);
-
         if (this.nightMesh.material.uniforms) {
-            this.nightMesh.material.uniforms.sunDirection.value.copy(this.sunLight.position);
+            this.nightMesh.material.uniforms.sunDirection.value.copy(sunPos);
         }
         if (this.atmosphereMesh.material.uniforms) {
-            this.atmosphereMesh.material.uniforms.sunDirection.value.copy(this.sunLight.position);
+            this.atmosphereMesh.material.uniforms.sunDirection.value.copy(sunPos);
         }
     }
 
