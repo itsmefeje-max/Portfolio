@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
@@ -23,86 +23,94 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-<body>
-
+<body class="arcade-page">
   <div id="loading-overlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text">INITIALIZING SYSTEMS</div>
+    <div class="loading-text">INITIALIZING ORBITAL SYSTEMS</div>
   </div>
 
-  <div id="sim-canvas"></div>
+  <div id="sim-canvas" aria-hidden="true"></div>
 
-  <!-- ARCADE HUB UI (Default Visible) -->
   <div id="arcade-hub-ui">
-    <div class="hub-header">
-      <h1 class="hub-title">LIVE SIMULATIONS ARCADE</h1>
-      <p class="hub-subtitle">Real-Time Earth Systems and Interactive Simulations</p>
-    </div>
+    <div class="hub-shell">
+      <div class="hub-copy">
+        <span class="hub-eyebrow">Flagship Interactive Portfolio</span>
+        <h1 class="hub-title">Orbital Earth, reimagined as a cinematic mission control experience.</h1>
+        <p class="hub-subtitle">
+          Real-time Earth illumination, improved ISS telemetry, orbital camera choreography, and an expandable celestial system designed to feel premium on every screen.
+        </p>
 
-    <div class="hub-grid">
-      <!-- Orbital Earth Card -->
-      <div class="hub-card" data-sim="orbital">
-        <div class="card-preview">
-          <div class="preview-icon">🌍</div>
-        </div>
-        <div class="card-content">
-          <h3>Orbital Earth</h3>
-          <p>Live Earth rotation, sunlight simulation, and real-time ISS tracking.</p>
-          <button class="btn-launch">LAUNCH SIMULATION</button>
+        <div class="hub-metrics" aria-label="System metrics">
+          <div class="metric-pill">
+            <span class="metric-label">Primary Mode</span>
+            <strong>Orbital Earth</strong>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-label">Expansion</span>
+            <strong>Solar System</strong>
+          </div>
+          <div class="metric-pill system-online">
+            <span class="pulse-dot"></span>
+            <strong>Systems Online</strong>
+          </div>
         </div>
       </div>
 
-      <!-- Flight Ops Card -->
-      <div class="hub-card" data-sim="flight">
-        <div class="card-preview">
-          <div class="preview-icon">✈️</div>
-        </div>
-        <div class="card-content">
-          <h3>Flight Operations</h3>
-          <p>Real-time global air traffic visualization with live telemetry.</p>
-          <button class="btn-launch">LAUNCH SIMULATION</button>
-        </div>
+      <div class="hub-grid">
+        <article class="hub-card featured" data-sim="orbital" tabindex="0" role="button" aria-label="Launch Orbital Earth simulation">
+          <div class="card-preview orbital-preview">
+            <div class="preview-core preview-earth"></div>
+            <div class="preview-ring preview-ring-1"></div>
+            <div class="preview-ring preview-ring-2"></div>
+          </div>
+          <div class="card-content">
+            <div class="card-kicker">Flagship Experience</div>
+            <h3>Orbital Earth</h3>
+            <p>Revamped Earth rendering, refined ISS tracking, predictive orbit trails, and responsive mission-control telemetry.</p>
+            <button class="btn-launch">Launch Orbital Earth</button>
+          </div>
+        </article>
+
+        <article class="hub-card" data-sim="solar" tabindex="0" role="button" aria-label="Launch Solar System simulation">
+          <div class="card-preview solar-preview">
+            <div class="preview-core preview-sun"></div>
+            <div class="planet-dot mercury"></div>
+            <div class="planet-dot venus"></div>
+            <div class="planet-dot mars"></div>
+          </div>
+          <div class="card-content">
+            <div class="card-kicker">Expanded Universe</div>
+            <h3>Solar System Explorer</h3>
+            <p>Continue outward from Earth into a curated, cinematic view of the Sun, Moon, planets, orbital paths, and deep-space ambience.</p>
+            <button class="btn-launch">Launch Solar System</button>
+          </div>
+        </article>
       </div>
 
-      <!-- Solar System Card -->
-      <div class="hub-card" data-sim="solar">
-        <div class="card-preview">
-          <div class="preview-icon">☀️</div>
-        </div>
-        <div class="card-content">
-          <h3>Solar System</h3>
-          <p>Cinematic heliocentric visualization of our solar neighborhood.</p>
-          <button class="btn-launch">LAUNCH SIMULATION</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="hub-footer">
-      <div class="status-indicator" style="display:flex; align-items:center; gap:8px; color:#4ade80; font-family:'JetBrains Mono'; font-size:0.8rem;">
-        <span class="pulse-dot"></span> SYSTEMS ONLINE
-      </div>
-      <div style="display: flex; gap: 16px;">
-        <a href="crush.html" class="btn-back">CRUSH KO</a>
-        <a href="index.html" class="btn-back">RETURN TO WEBSITE</a>
+      <div class="hub-footer">
+        <a href="index.html" class="btn-back">Return to Website</a>
+        <a href="crush.html" class="btn-back secondary">Crush KO</a>
       </div>
     </div>
   </div>
 
-  <!-- UNIFIED SIMULATION UI (Default Hidden) -->
   <div id="simulation-ui" class="hidden">
-    <!-- Top Bar -->
     <div class="sim-top-bar">
-      <div class="sim-info">
-        <span class="sim-label">ACTIVE SIMULATION //</span>
-        <span id="sim-title">ORBITAL EARTH</span>
+      <div class="sim-overview">
+        <span class="sim-label">Active Experience</span>
+        <div>
+          <div id="sim-title">ORBITAL EARTH</div>
+          <p id="sim-subtitle">Premium telemetry, live orbital context, and cinematic control.</p>
+        </div>
       </div>
-      <div class="sim-controls">
-        <button id="btn-switch-sim" class="btn-control">SWITCH SIMULATION</button>
-        <button id="btn-exit-arcade" class="btn-control">EXIT TO HUB</button>
+
+      <div class="sim-actions">
+        <button id="btn-switch-orbital" class="btn-control is-active" data-sim-target="orbital">Orbital Earth</button>
+        <button id="btn-switch-solar" class="btn-control" data-sim-target="solar">Solar System</button>
+        <button id="btn-exit-arcade" class="btn-control ghost">Exit to Hub</button>
       </div>
     </div>
 
-    <!-- Dynamic Content Container -->
     <div id="sim-content-layer"></div>
   </div>
 
