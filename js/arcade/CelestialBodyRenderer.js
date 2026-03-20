@@ -8,61 +8,41 @@ export class CelestialBodyRenderer {
       radius: 1,
       distance: 0,
       color: 0xffffff,
-      orbitColor: 0x333333,
       emissive: 0x000000,
       emissiveIntensity: 0,
       textureUrl: null,
+      orbitColor: 0x334155,
       orbitSpeed: 0.01,
-      rotationSpeed: 0.02,
+      rotationSpeed: 0.01,
+      tilt: 0.14,
+      ring: null,
       isSun: false
     }, options);
 
-    this.group = new THREE.Group();
-    // Move the group out to the correct distance
-    this.group.position.x = this.options.distance;
-
-    // Parent group to handle orbital rotation easily
     this.orbitGroup = new THREE.Group();
+    this.group = new THREE.Group();
+    this.group.position.x = this.options.distance;
     this.orbitGroup.add(this.group);
     this.scene.add(this.orbitGroup);
 
-    this.initMesh();
+    this.buildMesh();
     if (this.options.distance > 0) {
-      this.initOrbitPath();
+      this.buildOrbitPath();
+    }
+    if (this.options.ring) {
+      this.buildRing();
     }
   }
 
-  initMesh() {
+  buildMesh() {
     const geometry = new THREE.SphereGeometry(this.options.radius, 64, 64);
-
-    let material;
-    if (this.options.isSun) {
-      material = new THREE.MeshStandardMaterial({
-        color: this.options.color,
-        emissive: this.options.color,
-        emissiveIntensity: this.options.emissiveIntensity,
-        roughness: 0.4,
-        metalness: 0.1
-      });
-      // Add a simple glow effect
-      const glowGeo = new THREE.SphereGeometry(this.options.radius * 1.2, 32, 32);
-      const glowMat = new THREE.MeshBasicMaterial({
-        color: this.options.color,
-        transparent: true,
-        opacity: 0.15,
-        blending: THREE.AdditiveBlending,
-        side: THREE.BackSide
-      });
-      this.glowMesh = new THREE.Mesh(glowGeo, glowMat);
-      this.group.add(this.glowMesh);
-    } else {
-      material = new THREE.MeshStandardMaterial({
-        color: this.options.color,
-        emissive: this.options.emissive,
-        roughness: 0.7,
-        metalness: 0.1
-      });
-    }
+    const material = new THREE.MeshStandardMaterial({
+      color: this.options.color,
+      emissive: this.options.isSun ? this.options.color : this.options.emissive,
+      emissiveIntensity: this.options.emissiveIntensity,
+      roughness: this.options.isSun ? 0.6 : 0.92,
+      metalness: 0.02
+    });
 
     if (this.options.textureUrl) {
       const loader = new THREE.TextureLoader();
@@ -74,46 +54,53 @@ export class CelestialBodyRenderer {
     }
 
     this.mesh = new THREE.Mesh(geometry, material);
-
-    // Slight tilt to planets for some realism (except the sun to keep its axis simple)
-    if (!this.options.isSun) {
-        this.mesh.rotation.z = Math.PI / 8 * (Math.random() * 0.5 + 0.5);
-    }
+    this.mesh.rotation.z = this.options.tilt;
     this.group.add(this.mesh);
+
+    if (this.options.isSun) {
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        color: this.options.color,
+        transparent: true,
+        opacity: 0.16,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide
+      });
+      this.glowMesh = new THREE.Mesh(new THREE.SphereGeometry(this.options.radius * 1.25, 32, 32), glowMaterial);
+      this.group.add(this.glowMesh);
+    }
   }
 
-  initOrbitPath() {
-    const segments = 128;
-    const geometry = new THREE.BufferGeometry();
-    const vertices = [];
-
-    for (let i = 0; i <= segments; i++) {
-        const theta = (i / segments) * Math.PI * 2;
-        vertices.push(
-            Math.cos(theta) * this.options.distance,
-            0,
-            Math.sin(theta) * this.options.distance
-        );
-    }
-
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  buildOrbitPath() {
+    const curve = new THREE.EllipseCurve(0, 0, this.options.distance, this.options.distance, 0, Math.PI * 2, false, 0);
+    const points = curve.getPoints(180).map((point) => new THREE.Vector3(point.x, 0, point.y));
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const material = new THREE.LineBasicMaterial({
-        color: this.options.orbitColor,
-        transparent: true,
-        opacity: 0.3
+      color: this.options.orbitColor,
+      transparent: true,
+      opacity: 0.22
     });
-
     this.orbitLine = new THREE.LineLoop(geometry, material);
-    // Orbit line is centered at the parent (Sun)
     this.scene.add(this.orbitLine);
   }
 
-  update(deltaTime) {
-    // Orbital rotation around parent
-    if (this.options.distance > 0) {
-      this.orbitGroup.rotation.y += this.options.orbitSpeed * deltaTime;
-    }
-    // Axial rotation
+  buildRing() {
+    const { innerRadius, outerRadius, color } = this.options.ring;
+    const material = new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity: 0.32,
+      side: THREE.DoubleSide
+    });
+    this.ringMesh = new THREE.Mesh(new THREE.RingGeometry(innerRadius, outerRadius, 96), material);
+    this.ringMesh.rotation.x = Math.PI / 2.35;
+    this.group.add(this.ringMesh);
+  }
+
+  update(deltaTime = 1) {
+    this.orbitGroup.rotation.y += this.options.orbitSpeed * deltaTime;
     this.mesh.rotation.y += this.options.rotationSpeed * deltaTime;
+    if (this.glowMesh) {
+      this.glowMesh.rotation.y -= this.options.rotationSpeed * 0.3 * deltaTime;
+    }
   }
 }
