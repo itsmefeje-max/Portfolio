@@ -14,8 +14,9 @@ export class CameraDirector {
     this.controls.enablePan = false;
     this.controls.rotateSpeed = 0.5;
 
-    this.mode = 'FREE'; // FREE, ISS, USER, SUN
+    this.mode = 'FREE'; // FREE, ISS, USER, SUN, FOCUS
     this.targetVec = new THREE.Vector3();
+    this.focusObject = null;
   }
 
   setTarget(vec) {
@@ -38,7 +39,30 @@ export class CameraDirector {
     } else if (mode === 'ISS') {
         // Reset target to earth center initially? No, let update handle it.
     } else if (mode === 'FREE') {
-        this.flyTo(this.camera.position.clone(), new THREE.Vector3(0,0,0));
+        this.controls.minDistance = 12;
+        this.controls.maxDistance = 800; // Allow farther zoom out in Free mode
+        this.focusObject = null;
+        // Don't fly immediately on free mode unless specified, wait for flyTo call
+    } else if (mode === 'FOCUS' && data) {
+        this.controls.minDistance = 2; // Closer zoom for small planets
+        this.controls.maxDistance = 800;
+        this.focusObject = data; // store the celestial body renderer
+
+        // Calculate a good offset based on the planet's radius
+        const radius = data.options.radius || 5;
+        const offsetDist = radius * 3;
+
+        // Use mesh world position
+        const targetWorldPos = new THREE.Vector3();
+        data.mesh.getWorldPosition(targetWorldPos);
+
+        // We fly to a position slightly offset from the planet
+        const camPos = targetWorldPos.clone().add(new THREE.Vector3(offsetDist, offsetDist, offsetDist));
+
+        // Calculate the vector from the planet to the desired camera position
+        this.focusOffset = camPos.clone().sub(targetWorldPos);
+
+        this.flyTo(camPos, targetWorldPos);
     }
   }
 
@@ -76,6 +100,25 @@ export class CameraDirector {
         // Softly follow target using the internal targetVec which is updated by the simulation
         if (this.targetVec.lengthSq() > 0) {
             this.controls.target.lerp(this.targetVec, 0.1);
+        }
+    } else if (this.mode === 'FOCUS' && this.focusObject) {
+        // Continuously update the controls target to follow the planet's world position
+        const worldPos = new THREE.Vector3();
+        this.focusObject.mesh.getWorldPosition(worldPos);
+
+        // Lerp towards the moving planet so it's smooth
+        this.controls.target.lerp(worldPos, 0.1);
+
+        // If we are close enough to the target, strictly update the camera position
+        // so it orbits *with* the planet instead of being left behind.
+        if (this.focusOffset) {
+             const desiredCamPos = worldPos.clone().add(this.focusOffset);
+             // We lerp the camera position towards the desired position relative to the planet
+             this.camera.position.lerp(desiredCamPos, 0.1);
+
+             // Update focus offset based on user interaction (orbit controls)
+             // this keeps the manual rotation but relative to the new planet position
+             this.focusOffset.copy(this.camera.position).sub(worldPos);
         }
     }
 
