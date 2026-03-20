@@ -160,6 +160,55 @@ a, button, .spotlight-card, canvas { pointer-events: auto; }
 }
 .nav-links a:hover { color: white; }
 
+.premium-nav {
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.92), rgba(2, 6, 23, 0.72));
+  border-bottom-color: rgba(148, 163, 184, 0.14);
+}
+
+.nav-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-brand a {
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #67e8f9, #6366f1 70%);
+  box-shadow: 0 0 20px rgba(103, 232, 249, 0.45);
+}
+
+.nav-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.nav-meta-label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.nav-meta-link {
+  color: #c4b5fd;
+  text-decoration: none;
+}
+
+.nav-meta-link:hover {
+  color: white;
+}
+
+.nav-meta-separator {
+  color: rgba(148, 163, 184, 0.5);
+}
+
 .btn-primary {
   background: rgba(255,255,255,0.1);
   color: white !important;
@@ -512,6 +561,16 @@ button.method-card {
   .bento-grid, .goals-wrapper { grid-template-columns: 1fr; }
   
   /* Fix Navigation Overlap, Stacking & Accessibility */
+  .nav-brand-wrap {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-meta {
+    display: none;
+  }
+
   .nav-links {
     position: fixed; 
     top: var(--nav-height); 
