@@ -1,125 +1,130 @@
-
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const CAMERA_MODE_LABELS = {
+  FREE: 'Free Orbit',
+  ISS: 'ISS Track',
+  USER: 'Ground Lock',
+  FOCUS: 'Body Focus'
+};
 
 export class CameraDirector {
   constructor(camera, domElement) {
     this.camera = camera;
     this.controls = new OrbitControls(camera, domElement);
-
     this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
-    this.controls.minDistance = 12; // Earth radius 10
-    this.controls.maxDistance = 80;
+    this.controls.dampingFactor = 0.06;
     this.controls.enablePan = false;
-    this.controls.rotateSpeed = 0.5;
+    this.controls.rotateSpeed = 0.55;
+    this.controls.minDistance = 12;
+    this.controls.maxDistance = 140;
 
-    this.mode = 'FREE'; // FREE, ISS, USER, SUN, FOCUS
+    this.mode = 'FREE';
+    this.modeLabel = CAMERA_MODE_LABELS.FREE;
     this.targetVec = new THREE.Vector3();
+    this.followVelocity = new THREE.Vector3();
     this.focusObject = null;
+    this.focusOffset = new THREE.Vector3(16, 8, 16);
+    this.lastStableTarget = new THREE.Vector3();
+    this.transitionTween = null;
   }
 
-  setTarget(vec) {
-      if (vec) this.targetVec.copy(vec);
+  setTarget(vector) {
+    if (!vector) return;
+    this.targetVec.copy(vector);
+    this.lastStableTarget.copy(vector);
   }
 
   setMode(mode, data) {
     this.mode = mode;
-    console.log(`Camera Mode: ${mode}`);
+    this.modeLabel = CAMERA_MODE_LABELS[mode] || 'Simulation Camera';
+    this.focusObject = null;
+
+    if (mode === 'FREE') {
+      this.controls.minDistance = 12;
+      this.controls.maxDistance = 800;
+      return;
+    }
+
+    if (mode === 'ISS') {
+      this.controls.minDistance = 12;
+      this.controls.maxDistance = 120;
+      return;
+    }
 
     if (mode === 'USER' && data) {
-        // Data is user position vector
-        // Position camera above user
-        const camPos = data.clone().normalize().multiplyScalar(25);
-        this.flyTo(camPos, new THREE.Vector3(0,0,0));
-    } else if (mode === 'SUN' && data) {
-        // Fly to sun view (camera between sun and earth)
-        const sunPos = data.clone().normalize().multiplyScalar(30);
-        this.flyTo(sunPos, new THREE.Vector3(0,0,0));
-    } else if (mode === 'ISS') {
-        // Reset target to earth center initially? No, let update handle it.
-    } else if (mode === 'FREE') {
-        this.controls.minDistance = 12;
-        this.controls.maxDistance = 800; // Allow farther zoom out in Free mode
-        this.focusObject = null;
-        // Don't fly immediately on free mode unless specified, wait for flyTo call
-    } else if (mode === 'FOCUS' && data) {
-        this.controls.minDistance = 2; // Closer zoom for small planets
-        this.controls.maxDistance = 800;
-        this.focusObject = data; // store the celestial body renderer
+      const target = data.clone();
+      const position = target.clone().normalize().multiplyScalar(28);
+      this.flyTo(position, new THREE.Vector3(0, 0, 0));
+      this.setTarget(target);
+      return;
+    }
 
-        // Calculate a good offset based on the planet's radius
-        const radius = data.options.radius || 5;
-        const offsetDist = radius * 3;
-
-        // Use mesh world position
-        const targetWorldPos = new THREE.Vector3();
-        data.mesh.getWorldPosition(targetWorldPos);
-
-        // We fly to a position slightly offset from the planet
-        const camPos = targetWorldPos.clone().add(new THREE.Vector3(offsetDist, offsetDist, offsetDist));
-
-        // Calculate the vector from the planet to the desired camera position
-        this.focusOffset = camPos.clone().sub(targetWorldPos);
-
-        this.flyTo(camPos, targetWorldPos);
+    if (mode === 'FOCUS' && data?.mesh) {
+      this.controls.minDistance = Math.max(2, data.options.radius * 1.5);
+      this.controls.maxDistance = 800;
+      this.focusObject = data;
+      const worldPosition = new THREE.Vector3();
+      data.mesh.getWorldPosition(worldPosition);
+      const offsetDistance = Math.max(8, data.options.radius * 3.25);
+      this.focusOffset.set(offsetDistance, offsetDistance * 0.5, offsetDistance);
+      this.flyTo(worldPosition.clone().add(this.focusOffset), worldPosition);
     }
   }
 
-  flyTo(targetPos, lookAtPos) {
-    // Check for GSAP
+  flyTo(targetPosition, lookAtPosition) {
+    if (this.transitionTween?.kill) {
+      this.transitionTween.kill();
+      this.transitionTween = null;
+    }
+
     if (window.gsap) {
-      window.gsap.to(this.camera.position, {
-        duration: 1.5,
-        x: targetPos.x,
-        y: targetPos.y,
-        z: targetPos.z,
-        ease: "power2.inOut"
-      });
+      const timeline = window.gsap.timeline();
+      timeline.to(this.camera.position, {
+        duration: 1.25,
+        x: targetPosition.x,
+        y: targetPosition.y,
+        z: targetPosition.z,
+        ease: 'power2.inOut'
+      }, 0);
 
-      if (lookAtPos) {
-          window.gsap.to(this.controls.target, {
-            duration: 1.5,
-            x: lookAtPos.x,
-            y: lookAtPos.y,
-            z: lookAtPos.z,
-            ease: "power2.inOut"
-          });
+      if (lookAtPosition) {
+        timeline.to(this.controls.target, {
+          duration: 1.25,
+          x: lookAtPosition.x,
+          y: lookAtPosition.y,
+          z: lookAtPosition.z,
+          ease: 'power2.inOut'
+        }, 0);
       }
-    } else {
-       this.camera.position.copy(targetPos);
-       if (lookAtPos) this.controls.target.copy(lookAtPos);
+
+      this.transitionTween = timeline;
+      return;
+    }
+
+    this.camera.position.copy(targetPosition);
+    if (lookAtPosition) {
+      this.controls.target.copy(lookAtPosition);
     }
   }
 
-  update(optionalTarget) {
-    // If a target is passed directly (legacy support or one-off), use it temporarily or update targetVec
-    if (optionalTarget) this.targetVec.copy(optionalTarget);
-
+  update() {
     if (this.mode === 'ISS') {
-        // Softly follow target using the internal targetVec which is updated by the simulation
-        if (this.targetVec.lengthSq() > 0) {
-            this.controls.target.lerp(this.targetVec, 0.1);
-        }
-    } else if (this.mode === 'FOCUS' && this.focusObject) {
-        // Continuously update the controls target to follow the planet's world position
-        const worldPos = new THREE.Vector3();
-        this.focusObject.mesh.getWorldPosition(worldPos);
+      this.controls.target.lerp(this.lastStableTarget, 0.08);
+    }
 
-        // Lerp towards the moving planet so it's smooth
-        this.controls.target.lerp(worldPos, 0.1);
+    if (this.mode === 'USER') {
+      this.controls.target.lerp(this.lastStableTarget, 0.08);
+    }
 
-        // If we are close enough to the target, strictly update the camera position
-        // so it orbits *with* the planet instead of being left behind.
-        if (this.focusOffset) {
-             const desiredCamPos = worldPos.clone().add(this.focusOffset);
-             // We lerp the camera position towards the desired position relative to the planet
-             this.camera.position.lerp(desiredCamPos, 0.1);
+    if (this.mode === 'FOCUS' && this.focusObject?.mesh) {
+      const worldPosition = new THREE.Vector3();
+      this.focusObject.mesh.getWorldPosition(worldPosition);
+      this.controls.target.lerp(worldPosition, 0.08);
 
-             // Update focus offset based on user interaction (orbit controls)
-             // this keeps the manual rotation but relative to the new planet position
-             this.focusOffset.copy(this.camera.position).sub(worldPos);
-        }
+      const desiredPosition = worldPosition.clone().add(this.focusOffset);
+      this.camera.position.lerp(desiredPosition, 0.05);
+      this.focusOffset.copy(this.camera.position).sub(this.controls.target);
     }
 
     this.controls.update();

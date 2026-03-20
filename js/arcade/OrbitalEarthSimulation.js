@@ -1,288 +1,308 @@
-
 import * as THREE from 'three';
 import { ISSService } from './ISSService.js';
 import { GeoService } from './GeoService.js';
 import { HUDLayer } from './HUDLayer.js';
 
+const EARTH_RADIUS = 10;
+const ORBIT_RADIUS = EARTH_RADIUS + 0.65;
+const PREDICTION_STEPS = 160;
+const ORBITAL_PERIOD_SECONDS = 92 * 60;
+
 export class OrbitalEarthSimulation {
   constructor(system) {
     this.system = system;
-    this.renderer = system.renderer;
     this.scene = system.scene;
-    this.camera = system.camera;
-    this.earthGroup = system.earthRenderer.group;
     this.cameraDirector = system.cameraDirector;
+    this.earthGroup = system.earthRenderer.group;
+    this.timeEngine = system.timeEngine;
 
-    // Services
     this.issService = new ISSService();
     this.geoService = new GeoService();
-    this.hud = null; // Initialize on mount
-
-    // State
+    this.hud = null;
     this.isMounted = false;
+    this.boundEvents = [];
 
-    // Objects
     this.issMarker = null;
     this.userMarker = null;
     this.trailLine = null;
-    this.predLine = null;
+    this.predictionLine = null;
+    this.issPulse = null;
 
-    // Create objects once
     this.createObjects();
   }
 
   createObjects() {
-    // ISS Marker (Red)
     this.issMarker = new THREE.Mesh(
-      new THREE.SphereGeometry(0.15, 16, 16),
-      new THREE.MeshBasicMaterial({ color: 0xff3333 })
+      new THREE.SphereGeometry(0.18, 20, 20),
+      new THREE.MeshBasicMaterial({ color: 0x67e8f9 })
     );
 
-    // User Marker (Green)
+    this.issPulse = new THREE.Mesh(
+      new THREE.SphereGeometry(0.32, 20, 20),
+      new THREE.MeshBasicMaterial({
+        color: 0x67e8f9,
+        transparent: true,
+        opacity: 0.2,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    this.issMarker.add(this.issPulse);
+
     this.userMarker = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 16, 16),
-      new THREE.MeshBasicMaterial({ color: 0x33ff33 })
+      new THREE.SphereGeometry(0.14, 18, 18),
+      new THREE.MeshBasicMaterial({ color: 0x4ade80 })
     );
 
-    // Orbit Lines
-    const trailMat = new THREE.LineBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.6 });
-    const trailGeo = new THREE.BufferGeometry();
-    this.trailLine = new THREE.Line(trailGeo, trailMat);
+    this.trailLine = new THREE.Line(
+      new THREE.BufferGeometry(),
+      new THREE.LineBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.9 })
+    );
 
-    const predMat = new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.4 });
-    const predGeo = new THREE.BufferGeometry();
-    this.predLine = new THREE.Line(predGeo, predMat);
+    this.predictionLine = new THREE.Line(
+      new THREE.BufferGeometry(),
+      new THREE.LineDashedMaterial({ color: 0xf472b6, dashSize: 0.32, gapSize: 0.16, transparent: true, opacity: 0.82 })
+    );
   }
 
   mount() {
     if (this.isMounted) return;
     this.isMounted = true;
-    console.log("Mounting Orbital Earth Simulation");
 
-    // 1. Inject UI
     const uiLayer = document.getElementById('sim-content-layer');
     if (uiLayer) {
-        uiLayer.innerHTML = `
-          <!-- Top Right -->
-          <div class="hud-panel hud-top-right">
-            <div class="data-row">
-              <span class="data-label">OPERATOR</span>
-              <span class="data-value">GUEST</span>
-            </div>
-            <div class="data-row">
-              <span class="data-label">LOCATION</span>
-              <span class="data-value" id="user-loc">SCANNING...</span>
-            </div>
-            <div class="data-row">
-                <span class="data-label">UTC TIME</span>
-                <span class="data-value" id="utc-time">--:--:--</span>
-            </div>
-          </div>
-
-          <!-- Bottom Group (Unified Sheet on Mobile) -->
-          <div class="hud-bottom-group">
-            <!-- Bottom Left -->
-            <div class="hud-panel hud-bottom-left">
-              <div style="margin-bottom:8px; color:#f472b6; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">ISS TELEMETRY</div>
-              <div class="data-row">
-                <span class="data-label">LATITUDE</span>
-                <span class="data-value" id="iss-lat">0.0000</span>
-              </div>
-              <div class="data-row">
-                <span class="data-label">LONGITUDE</span>
-                <span class="data-value" id="iss-lon">0.0000</span>
-              </div>
-              <div class="data-row">
-                <span class="data-label">ALTITUDE</span>
-                <span class="data-value" id="iss-alt">0.00 km</span>
-              </div>
-              <div class="data-row">
-                <span class="data-label">VELOCITY</span>
-                <span class="data-value" id="iss-vel">0 km/h</span>
-              </div>
-               <div class="status-bar" id="status-msg">SYSTEM ONLINE</div>
-            </div>
-
-            <!-- Bottom Right -->
-            <div class="hud-panel hud-bottom-right">
-              <div class="data-label" style="width:100%; text-align:right; margin-bottom:5px; opacity:0.7;">CAMERA CONTROL</div>
-              <button id="btn-mode-free" class="btn-control">FREE ORBIT</button>
-              <button id="btn-mode-iss" class="btn-control">TRACK ISS</button>
-              <button id="btn-mode-user" class="btn-control">LOCATE USER</button>
-            </div>
-          </div>
-        `;
+      uiLayer.innerHTML = this.getTemplate();
     }
 
-    // 2. Initialize HUD (now that elements exist)
     this.hud = new HUDLayer();
+    this.bindControls();
 
-    // 3. Add Objects to Earth Group
     this.earthGroup.add(this.issMarker);
     this.earthGroup.add(this.userMarker);
     this.earthGroup.add(this.trailLine);
-    this.earthGroup.add(this.predLine);
+    this.earthGroup.add(this.predictionLine);
 
-    // 4. Start Services
-    this.issService.start();
-    this.geoService.fetchLocation().then(() => {
-        // Just triggers internal state update, we poll it in update()
+    this.hud.setStatus('Acquiring live ISS telemetry and ground reference.');
+    this.hud.setCameraMode(this.cameraDirector.modeLabel);
+
+    void this.issService.start();
+    void this.geoService.fetchLocation().then((location) => {
+      this.hud?.updateUser(location);
     });
 
-    // 5. Setup Camera
     this.cameraDirector.setMode('ISS');
-
-    // 6. Bind UI Buttons
-    this.bindEvents();
+    this.hud.setCameraMode(this.cameraDirector.modeLabel);
   }
 
-  bindEvents() {
-    const btnFree = document.getElementById('btn-mode-free');
-    if (btnFree) btnFree.addEventListener('click', () => this.cameraDirector.setMode('FREE'));
+  getTemplate() {
+    return `
+      <section class="hud-panel hud-top-left">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Orbital Mission Control</div>
+            <h2>Orbital Earth</h2>
+          </div>
+          <div class="status-pill"><span class="pulse-dot"></span><span id="camera-mode-label">ISS Track</span></div>
+        </div>
+        <p class="panel-description">A refined Earth presentation with live station telemetry, predictive orbital context, and smoother camera choreography across desktop and mobile.</p>
+        <div class="data-grid">
+          <div class="data-card">
+            <span class="data-label">UTC Time</span>
+            <strong id="utc-time">--</strong>
+          </div>
+          <div class="data-card">
+            <span class="data-label">Sun Vector</span>
+            <strong>${new Date().toUTCString().slice(17, 22)} live</strong>
+          </div>
+          <div class="data-card">
+            <span class="data-label">Ground Location</span>
+            <strong id="user-loc">Scanning…</strong>
+          </div>
+          <div class="data-card">
+            <span class="data-label">Local Coordinates</span>
+            <strong id="user-coords">--</strong>
+          </div>
+          <div class="data-card">
+            <span class="data-label">Time Zone</span>
+            <strong id="user-timezone">UTC</strong>
+          </div>
+          <div class="data-card">
+            <span class="data-label">Telemetry State</span>
+            <strong id="status-msg">Initializing</strong>
+          </div>
+        </div>
+      </section>
 
-    const btnISS = document.getElementById('btn-mode-iss');
-    if (btnISS) btnISS.addEventListener('click', () => this.cameraDirector.setMode('ISS'));
+      <section class="hud-panel hud-top-right">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Orbit Readout</div>
+            <h3>ISS Telemetry</h3>
+          </div>
+        </div>
+        <div class="hud-stack">
+          <div class="data-row"><span class="data-label">Latitude</span><span class="data-value" id="iss-lat">--</span></div>
+          <div class="data-row"><span class="data-label">Longitude</span><span class="data-value" id="iss-lon">--</span></div>
+          <div class="data-row"><span class="data-label">Altitude</span><span class="data-value" id="iss-alt">--</span></div>
+          <div class="data-row"><span class="data-label">Velocity</span><span class="data-value" id="iss-vel">--</span></div>
+          <div class="data-row"><span class="data-label">Visibility</span><span class="data-value" id="iss-visibility">--</span></div>
+          <div class="timeline-meter"><span id="orbit-progress"></span></div>
+          <div class="data-note" id="orbit-prediction">Forecast horizon 45 min</div>
+        </div>
+      </section>
 
-    const btnUser = document.getElementById('btn-mode-user');
-    if (btnUser) btnUser.addEventListener('click', () => {
-        const loc = this.geoService.getLocation();
-        if (loc) {
-             const localPos = this.latLonToVector3(loc.lat, loc.lon, 10);
-             const worldPos = localPos.clone().applyMatrix4(this.earthGroup.matrixWorld);
-             this.cameraDirector.setMode('USER', worldPos);
-        }
+      <section class="hud-panel hud-bottom-left">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Trajectory Layer</div>
+            <h3>Live Orbit Visualization</h3>
+          </div>
+        </div>
+        <p class="data-note">ISS trail history and forward projection are rendered independently for better spatial readability and less visual clutter.</p>
+        <div class="orbit-legend">
+          <span class="legend-item"><span class="legend-swatch trail"></span>Live trail</span>
+          <span class="legend-item"><span class="legend-swatch prediction"></span>Predicted path</span>
+          <span class="legend-item"><span class="legend-swatch user"></span>Ground marker</span>
+        </div>
+        <div class="status-bar">Optimized for smaller screens with stacked panels, larger touch targets, and low-clutter telemetry grouping.</div>
+      </section>
+
+      <section class="hud-panel hud-bottom-right">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Camera Control</div>
+            <h3>Intentional Navigation</h3>
+          </div>
+        </div>
+        <div class="control-stack">
+          <div class="control-label">Select a tracking mode</div>
+          <div class="control-group">
+            <button class="btn-control" id="btn-mode-free">Free Orbit</button>
+            <button class="btn-control is-active" id="btn-mode-iss">Track ISS</button>
+            <button class="btn-control" id="btn-mode-user">Locate User</button>
+            <button class="btn-control" id="btn-mode-reset">Reset View</button>
+          </div>
+          <div class="status-bar">Camera transitions are eased to reduce snapping, focus jitter, and disorienting jumps between targets.</div>
+        </div>
+      </section>
+    `;
+  }
+
+  bindControls() {
+    this.addListener('btn-mode-free', 'click', () => this.setCameraMode('FREE'));
+    this.addListener('btn-mode-iss', 'click', () => this.setCameraMode('ISS'));
+    this.addListener('btn-mode-user', 'click', () => {
+      const location = this.geoService.getLocation();
+      if (!location) return;
+      const localPosition = this.latLonToVector3(location.lat, location.lon, EARTH_RADIUS + 1.6);
+      const worldPosition = localPosition.clone().applyMatrix4(this.earthGroup.matrixWorld);
+      this.setCameraMode('USER', worldPosition);
+    });
+    this.addListener('btn-mode-reset', 'click', () => {
+      this.setCameraMode('FREE');
+      this.cameraDirector.flyTo(new THREE.Vector3(0, 10, 32), new THREE.Vector3(0, 0, 0));
+    });
+  }
+
+  addListener(id, event, handler) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.addEventListener(event, handler);
+    this.boundEvents.push({ element, event, handler });
+  }
+
+  setCameraMode(mode, payload) {
+    this.cameraDirector.setMode(mode, payload);
+    this.hud?.setCameraMode(this.cameraDirector.modeLabel);
+    document.querySelectorAll('.hud-bottom-right .btn-control').forEach((button) => {
+      button.classList.toggle('is-active', button.id === `btn-mode-${mode.toLowerCase()}`);
     });
   }
 
   unmount() {
     if (!this.isMounted) return;
     this.isMounted = false;
-    console.log("Unmounting Orbital Earth Simulation");
 
-    // 1. Remove Objects
+    this.boundEvents.forEach(({ element, event, handler }) => element.removeEventListener(event, handler));
+    this.boundEvents = [];
+
+    this.issService.stop();
+    this.cameraDirector.setMode('FREE');
+
     this.earthGroup.remove(this.issMarker);
     this.earthGroup.remove(this.userMarker);
     this.earthGroup.remove(this.trailLine);
-    this.earthGroup.remove(this.predLine);
+    this.earthGroup.remove(this.predictionLine);
 
-    // 2. Stop Services
-    // ISSService doesn't have stop(), but we stop calling update()
-    // Ideally we should stop the interval inside ISSService if exists
-    // But for now, just letting it run in background is fine, or add stop() later.
-
-    // 3. Clear UI
     const uiLayer = document.getElementById('sim-content-layer');
     if (uiLayer) uiLayer.innerHTML = '';
-
     this.hud = null;
   }
 
   update(time) {
     if (!this.isMounted) return;
 
-    // HUD Updates
-    if (this.hud) {
-        this.hud.updateTime(time);
+    this.hud?.updateTime(time);
 
-        const loc = this.geoService.getLocation();
-        this.hud.updateUser(loc);
+    const user = this.geoService.getLocation();
+    if (user) {
+      this.hud?.updateUser(user);
+      const userPosition = this.latLonToVector3(user.lat, user.lon, EARTH_RADIUS + 0.25);
+      this.userMarker.position.copy(userPosition);
+      this.userMarker.visible = true;
     }
 
-    // ISS Position
     const issData = this.issService.getPosition();
     if (issData) {
-        const r = 10 + (issData.alt / 6371) * 10;
-        const pos = this.latLonToVector3(issData.lat, issData.lon, r);
-        this.issMarker.position.copy(pos);
+      const issPosition = this.latLonToVector3(issData.lat, issData.lon, ORBIT_RADIUS + (issData.alt - 400) / 1200);
+      this.issMarker.position.copy(issPosition);
+      const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.18;
+      this.issPulse.scale.setScalar(pulse);
+      this.hud?.updateISS(issData);
+      this.hud?.setStatus(`Telemetry ${this.issService.getStatus()} · Updated ${new Date(issData.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+      this.updateOrbitPath(issData);
 
-        this.updateOrbitPath();
+      if (this.cameraDirector.mode === 'ISS') {
+        const worldPosition = issPosition.clone().applyMatrix4(this.earthGroup.matrixWorld);
+        this.cameraDirector.setTarget(worldPosition);
+      }
+    }
+  }
 
-        if (this.hud) this.hud.updateISS(issData);
+  updateOrbitPath(current) {
+    const history = this.issService.getHistory();
+    if (history.length < 2) return;
+
+    const trailPoints = history.slice(-120).map((entry) => {
+      const radius = ORBIT_RADIUS + (entry.alt - 400) / 1200;
+      return this.latLonToVector3(entry.lat, entry.lon, radius);
+    });
+    this.trailLine.geometry.setFromPoints(trailPoints);
+
+    const predictionPoints = [];
+    const currentLon = current.lon;
+    for (let index = 0; index < PREDICTION_STEPS; index += 1) {
+      const progress = index / (PREDICTION_STEPS - 1);
+      const futureSeconds = progress * ORBITAL_PERIOD_SECONDS * 0.5;
+      const futureLon = currentLon + (futureSeconds / ORBITAL_PERIOD_SECONDS) * 360 * 1.02;
+      const futureLat = current.lat + Math.sin(progress * Math.PI * 2) * 18;
+      predictionPoints.push(this.latLonToVector3(futureLat, futureLon, ORBIT_RADIUS));
     }
 
-    // User Position
-    const userData = this.geoService.getLocation();
-    if (userData && userData.lat) {
-        const pos = this.latLonToVector3(userData.lat, userData.lon, 10);
-        this.userMarker.position.copy(pos);
-    }
-
-    // Camera Tracking
-    if (this.cameraDirector.mode === 'ISS') {
-        const issWorldPos = new THREE.Vector3();
-        this.issMarker.getWorldPosition(issWorldPos);
-        this.cameraDirector.setTarget(issWorldPos);
-    }
+    this.predictionLine.geometry.setFromPoints(predictionPoints);
+    this.predictionLine.computeLineDistances();
+    this.hud?.updateOrbit({
+      progress: ((current.lon + 180) % 360) / 360,
+      predictionMinutes: 45
+    });
   }
 
   latLonToVector3(lat, lon, radius) {
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
-
-    const x = -(radius * Math.sin(phi) * Math.cos(theta));
-    const z = (radius * Math.sin(phi) * Math.sin(theta));
-    const y = (radius * Math.cos(phi));
-
-    return new THREE.Vector3(x, y, z);
-  }
-
-  updateOrbitPath() {
-    const history = this.issService.getHistory();
-    if (history.length < 2) return;
-
-    // --- TRAIL ---
-    const trailPoints = [];
-    for (const h of history) {
-        const r = 10 + (h.alt / 6371) * 10;
-        trailPoints.push(this.latLonToVector3(h.lat, h.lon, r));
-    }
-    this.trailLine.geometry.setFromPoints(trailPoints);
-
-    // --- PREDICTION ---
-    // Use last 2 points to determine orbital plane and velocity vector
-    const last = history[history.length - 1];
-    const prev = history[history.length - 2];
-
-    // Convert to vectors
-    const rLast = 10 + (last.alt/6371)*10;
-    const rPrev = 10 + (prev.alt/6371)*10;
-
-    const vLast = this.latLonToVector3(last.lat, last.lon, rLast);
-    const vPrev = this.latLonToVector3(prev.lat, prev.lon, rPrev);
-
-    // Direction
-    const velDir = vLast.clone().sub(vPrev).normalize();
-
-    // Normal to orbital plane = Pos x Vel
-    const normal = vLast.clone().cross(velDir).normalize();
-
-    // Propagation parameters
-    const predictDuration = 45 * 60; // 45 minutes
-    const steps = 60;
-    const dt = predictDuration / steps;
-
-    // Orbital angular speed: 2PI / Period. Period ~ 93 mins = 5580s.
-    const orbitalSpeed = (2 * Math.PI) / 5580;
-
-    // Earth rotation speed: 2PI / 86164
-    const earthSpeed = (2 * Math.PI) / 86164;
-
-    const predPoints = [vLast];
-
-    for(let i=1; i<=steps; i++) {
-        const t = i * dt;
-        const orbitAngle = orbitalSpeed * t;
-        const earthAngle = earthSpeed * t;
-
-        // 1. Orbital motion in Inertial Frame
-        const pOrbital = vLast.clone().applyAxisAngle(normal, orbitAngle);
-
-        // 2. Adjust for Earth Rotation (Ground Track)
-        pOrbital.applyAxisAngle(new THREE.Vector3(0, 1, 0), -earthAngle);
-
-        predPoints.push(pOrbital);
-    }
-
-    this.predLine.geometry.setFromPoints(predPoints);
+    return new THREE.Vector3(
+      -(radius * Math.sin(phi) * Math.cos(theta)),
+      radius * Math.cos(phi),
+      radius * Math.sin(phi) * Math.sin(theta)
+    );
   }
 }

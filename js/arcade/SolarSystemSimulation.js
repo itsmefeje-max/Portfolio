@@ -1,155 +1,181 @@
 import * as THREE from 'three';
 import { CelestialBodyRenderer } from './CelestialBodyRenderer.js';
 
+const BODY_DEFINITIONS = [
+  { name: 'Sun', radius: 18, distance: 0, color: 0xfbbf24, emissiveIntensity: 2.4, orbitSpeed: 0, rotationSpeed: 0.003, isSun: true, summary: 'The luminous anchor of the simulation and the main local light source.' },
+  { name: 'Mercury', radius: 1.2, distance: 34, color: 0x94a3b8, orbitColor: 0x475569, orbitSpeed: 0.032, rotationSpeed: 0.009, summary: 'Fast inner-world orbit with compact scale and high contrast shading.' },
+  { name: 'Venus', radius: 2.5, distance: 52, color: 0xf5d08d, orbitColor: 0x8b6b42, orbitSpeed: 0.022, rotationSpeed: 0.005, summary: 'Warm atmospheric tone with a slower cinematic orbital cadence.' },
+  { name: 'Earth', radius: 3.4, distance: 74, color: 0xffffff, orbitColor: 0x2563eb, orbitSpeed: 0.016, rotationSpeed: 0.02, textureUrl: 'assets/textures/earth-blue-marble.jpg', summary: 'The same premium Earth palette extended into heliocentric context.' },
+  { name: 'Mars', radius: 1.8, distance: 98, color: 0xfb7185, orbitColor: 0x9a3412, orbitSpeed: 0.013, rotationSpeed: 0.016, summary: 'A stylized red-world readout focused on recognizable silhouette and orbit legibility.' },
+  { name: 'Jupiter', radius: 8, distance: 146, color: 0xe7c7a2, orbitColor: 0x7c5a42, orbitSpeed: 0.008, rotationSpeed: 0.032, summary: 'Expanded giant-planet presentation with a broader camera offset for readability.' },
+  { name: 'Saturn', radius: 6.8, distance: 196, color: 0xf1d7ab, orbitColor: 0x8c6d50, orbitSpeed: 0.005, rotationSpeed: 0.029, ring: { innerRadius: 9.2, outerRadius: 13.4, color: 0xf8e7c7 }, summary: 'Signature ring system rendered as a premium focal body.' },
+  { name: 'Uranus', radius: 4.6, distance: 246, color: 0x93c5fd, orbitColor: 0x1d4ed8, orbitSpeed: 0.0036, rotationSpeed: 0.022, summary: 'Cool, distant palette and restrained motion for clean deep-space composition.' },
+  { name: 'Neptune', radius: 4.3, distance: 294, color: 0x60a5fa, orbitColor: 0x1e3a8a, orbitSpeed: 0.0028, rotationSpeed: 0.024, summary: 'Outer-world framing with a darker blue read for contrast against the starfield.' }
+];
+
 export class SolarSystemSimulation {
   constructor(system) {
     this.system = system;
     this.scene = system.scene;
     this.cameraDirector = system.cameraDirector;
-
     this.isMounted = false;
-    this.bodies = [];
+    this.boundEvents = [];
 
     this.baseGroup = new THREE.Group();
+    this.baseGroup.visible = false;
     this.scene.add(this.baseGroup);
 
-    // Create central light representing the sun locally
-    this.sunPointLight = new THREE.PointLight(0xffeedd, 5, 2000);
-    this.baseGroup.add(this.sunPointLight);
+    this.bodies = BODY_DEFINITIONS.map((definition) => ({
+      definition,
+      renderer: new CelestialBodyRenderer(this.baseGroup, definition)
+    }));
 
-    // Instantiate celestial bodies with "cinematic scale"
-    // Distances are significantly compressed for easier viewing, but ordered correctly.
-    const planetData = [
-      { name: 'Sun',     radius: 20,  distance: 0,   color: 0xffcc00, orbitColor: null,    emissiveIntensity: 2,   orbitSpeed: 0,     rotationSpeed: 0.005, isSun: true },
-      { name: 'Mercury', radius: 1.5, distance: 35,  color: 0x888888, orbitColor: 0x555555, emissiveIntensity: 0,   orbitSpeed: 0.04,  rotationSpeed: 0.01 },
-      { name: 'Venus',   radius: 3,   distance: 55,  color: 0xe3bb76, orbitColor: 0x887755, emissiveIntensity: 0,   orbitSpeed: 0.015, rotationSpeed: 0.008 },
-      { name: 'Earth',   radius: 3.5, distance: 80,  color: 0x2233ff, orbitColor: 0x334488, emissiveIntensity: 0,   orbitSpeed: 0.01,  rotationSpeed: 0.02, textureUrl: 'assets/textures/earth-blue-marble.jpg' },
-      { name: 'Mars',    radius: 2,   distance: 110, color: 0xc1440e, orbitColor: 0x883311, emissiveIntensity: 0,   orbitSpeed: 0.008, rotationSpeed: 0.018 },
-      { name: 'Jupiter', radius: 10,  distance: 170, color: 0xd39c7e, orbitColor: 0x775544, emissiveIntensity: 0,   orbitSpeed: 0.004, rotationSpeed: 0.04 },
-      { name: 'Saturn',  radius: 8,   distance: 230, color: 0xead6b8, orbitColor: 0x887766, emissiveIntensity: 0,   orbitSpeed: 0.003, rotationSpeed: 0.038 },
-      { name: 'Uranus',  radius: 5,   distance: 290, color: 0x4b70dd, orbitColor: 0x334477, emissiveIntensity: 0,   orbitSpeed: 0.002, rotationSpeed: 0.025 },
-      { name: 'Neptune', radius: 4.8, distance: 350, color: 0x274687, orbitColor: 0x223366, emissiveIntensity: 0,   orbitSpeed: 0.001, rotationSpeed: 0.028 }
-    ];
-
-    planetData.forEach(data => {
-      const body = new CelestialBodyRenderer(this.baseGroup, data);
-      this.bodies.push({ name: data.name, renderer: body });
+    const earthRenderer = this.bodies.find((body) => body.definition.name === 'Earth')?.renderer;
+    this.moon = new CelestialBodyRenderer(earthRenderer.group, {
+      name: 'Moon',
+      radius: 0.82,
+      distance: 8,
+      color: 0xe5e7eb,
+      orbitColor: 0x94a3b8,
+      orbitSpeed: 0.038,
+      rotationSpeed: 0.008,
+      tilt: 0.04,
+      summary: 'Earth companion orbiting inside the larger heliocentric composition.'
     });
 
-    // Special case for Moon orbiting Earth
-    const earthRenderer = this.bodies.find(b => b.name === 'Earth').renderer;
-    this.moonRenderer = new CelestialBodyRenderer(earthRenderer.group, {
-        name: 'Moon',
-        radius: 0.8,
-        distance: 7, // local to Earth
-        color: 0xaaaaaa,
-        orbitColor: 0x777777,
-        orbitSpeed: 0.03,
-        rotationSpeed: 0.005
-    });
+    this.sunLight = new THREE.PointLight(0xfff1bf, 5, 2000, 1.5);
+    this.baseGroup.add(this.sunLight);
+    this.sunLight.position.set(0, 0, 0);
 
-    // Hidden by default
-    this.baseGroup.visible = false;
-    // Keep EarthRenderer invisible by default since we provide our own Earth
-    // We'll toggle it on mount
+    this.selectedBodyName = 'Overview';
   }
 
   mount() {
     if (this.isMounted) return;
     this.isMounted = true;
-    console.log("Mounting Solar System Explorer");
-
-    // Hide original OrbitalEarth Simulation Earth
-    if (this.system.earthRenderer) {
-      this.system.earthRenderer.group.visible = false;
-    }
-
-    // Disable global sunlight so it doesn't interfere with our local sun
-    if (this.system.globalSunLight) {
-        this.system.globalSunLight.visible = false;
-    }
-
     this.baseGroup.visible = true;
+    this.system.earthRenderer.group.visible = false;
+    if (this.system.globalSunLight) this.system.globalSunLight.visible = false;
 
-    // Initially fly out to view the solar system
-    this.cameraDirector.setMode('FREE');
-    this.cameraDirector.flyTo(new THREE.Vector3(0, 150, 450), new THREE.Vector3(0, 0, 0));
-
-    // UI Injection
-    const uiLayer = document.getElementById('sim-content-layer');
-    if (uiLayer) {
-        let planetButtons = this.bodies.map(b =>
-            `<button class="btn-control planet-btn" data-target="${b.name}">${b.name.toUpperCase()}</button>`
-        ).join('');
-
-        uiLayer.innerHTML = `
-          <div class="hud-panel hud-bottom-left" style="width: 100%; max-width: 600px; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
-            <div style="width:100%; margin-bottom:10px; color:#f472b6; font-weight:700; letter-spacing:0.05em; font-size:0.8rem;">SELECT CELESTIAL BODY</div>
-            ${planetButtons}
-            <button class="btn-control planet-btn" data-target="Moon">MOON</button>
-            <button class="btn-control planet-btn" data-target="Overview">OVERVIEW</button>
-          </div>
-        `;
-    }
-
+    this.injectUI();
     this.bindEvents();
+    this.focusOverview();
+  }
+
+  injectUI() {
+    const uiLayer = document.getElementById('sim-content-layer');
+    if (!uiLayer) return;
+    const buttons = [...this.bodies.map(({ definition }) => definition.name), 'Moon', 'Overview']
+      .map((name) => `<button class="btn-control ${name === 'Overview' ? 'is-active' : ''}" data-target-body="${name}">${name}</button>`)
+      .join('');
+
+    uiLayer.innerHTML = `
+      <section class="hud-panel hud-top-left">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Expanded Celestial Layer</div>
+            <h2>Solar System Explorer</h2>
+          </div>
+        </div>
+        <p class="panel-description">Earth now scales into a curated heliocentric experience with intentional orbit compression, cleaner focus states, and modular body rendering.</p>
+        <div class="panel-facts">
+          <div class="data-card"><span class="data-label">Primary Light</span><strong>Local Sun Core</strong></div>
+          <div class="data-card"><span class="data-label">Body Count</span><strong>${this.bodies.length + 1}</strong></div>
+          <div class="data-card"><span class="data-label">Mode</span><strong id="solar-mode-label">Overview</strong></div>
+          <div class="data-card"><span class="data-label">Scale</span><strong>Cinematic</strong></div>
+        </div>
+      </section>
+
+      <section class="hud-panel hud-top-right">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Body Dossier</div>
+            <h3 id="solar-body-title">Overview</h3>
+          </div>
+        </div>
+        <p class="panel-description" id="solar-body-summary">Select a celestial body to reframe the camera and move from Earth outward into the larger system.</p>
+      </section>
+
+      <section class="hud-panel solar-selector">
+        <div class="panel-title">
+          <div>
+            <div class="panel-kicker">Celestial Navigation</div>
+            <h3>Choose a body</h3>
+          </div>
+        </div>
+        <div class="selector-grid">${buttons}</div>
+      </section>
+    `;
   }
 
   bindEvents() {
-    document.querySelectorAll('.planet-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const targetName = e.target.getAttribute('data-target');
-            if (targetName === 'Overview') {
-                this.cameraDirector.setMode('FREE');
-                this.cameraDirector.flyTo(new THREE.Vector3(0, 150, 450), new THREE.Vector3(0, 0, 0));
-                return;
-            }
-
-            let targetBody;
-            if (targetName === 'Moon') {
-                targetBody = this.moonRenderer;
-            } else {
-                targetBody = this.bodies.find(b => b.name === targetName)?.renderer;
-            }
-
-            if (targetBody) {
-                // Determine target object for camera to track
-                // We use the mesh so we track its world position accurately
-                this.cameraDirector.setMode('FOCUS', targetBody);
-            }
-        });
+    document.querySelectorAll('[data-target-body]').forEach((button) => {
+      const handler = () => this.focusBody(button.getAttribute('data-target-body'));
+      button.addEventListener('click', handler);
+      this.boundEvents.push({ element: button, event: 'click', handler });
     });
+  }
+
+  focusOverview() {
+    this.selectedBodyName = 'Overview';
+    this.cameraDirector.setMode('FREE');
+    this.cameraDirector.flyTo(new THREE.Vector3(0, 110, 330), new THREE.Vector3(0, 0, 0));
+    this.syncSelectionState();
+    this.updateInfoPanel('Overview', 'Select a celestial body to inspect orbit spacing, planetary scale, and the Earth-to-solar-system expansion path.');
+  }
+
+  focusBody(name) {
+    if (name === 'Overview') {
+      this.focusOverview();
+      return;
+    }
+
+    this.selectedBodyName = name;
+    const target = name === 'Moon'
+      ? { definition: { name: 'Moon', summary: 'Earth companion orbiting within the larger solar composition.' }, renderer: this.moon }
+      : this.bodies.find((body) => body.definition.name === name);
+
+    if (!target) return;
+
+    this.cameraDirector.setMode('FOCUS', target.renderer);
+    this.updateInfoPanel(target.definition.name, target.definition.summary);
+    this.syncSelectionState();
+
+    const modeLabel = document.getElementById('solar-mode-label');
+    if (modeLabel) modeLabel.textContent = target.definition.name;
+  }
+
+  syncSelectionState() {
+    document.querySelectorAll('[data-target-body]').forEach((button) => {
+      button.classList.toggle('is-active', button.getAttribute('data-target-body') === this.selectedBodyName);
+    });
+  }
+
+  updateInfoPanel(title, summary) {
+    const titleElement = document.getElementById('solar-body-title');
+    const summaryElement = document.getElementById('solar-body-summary');
+    if (titleElement) titleElement.textContent = title;
+    if (summaryElement) summaryElement.textContent = summary;
   }
 
   unmount() {
     if (!this.isMounted) return;
     this.isMounted = false;
-    console.log("Unmounting Solar System Explorer");
+    this.boundEvents.forEach(({ element, event, handler }) => element.removeEventListener(event, handler));
+    this.boundEvents = [];
 
     this.baseGroup.visible = false;
-
-    // Restore original OrbitalEarth
-    if (this.system.earthRenderer) {
-      this.system.earthRenderer.group.visible = true;
-    }
-
-    // Restore global sunlight
-    if (this.system.globalSunLight) {
-        this.system.globalSunLight.visible = true;
-    }
+    this.system.earthRenderer.group.visible = true;
+    if (this.system.globalSunLight) this.system.globalSunLight.visible = true;
+    this.cameraDirector.setMode('FREE');
 
     const uiLayer = document.getElementById('sim-content-layer');
     if (uiLayer) uiLayer.innerHTML = '';
   }
 
-  update(time) {
+  update() {
     if (!this.isMounted) return;
-
-    // We don't use real time for the cinematic solar system,
-    // we use a fixed delta for smooth continuous rotation.
-    const delta = 1; // 60fps assumed or use a clock
-
-    this.bodies.forEach(b => b.renderer.update(delta));
-    this.moonRenderer.update(delta);
+    this.bodies.forEach((body) => body.renderer.update(1));
+    this.moon.update(1);
   }
 }
