@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
 export class CelestialBodyRenderer {
-  constructor(scene, options) {
+  constructor(scene, options, loadingManager) {
     this.scene = scene;
+    this.loadingManager = loadingManager;
     this.options = Object.assign({
       name: 'Unknown',
       radius: 1,
@@ -45,7 +46,7 @@ export class CelestialBodyRenderer {
     });
 
     if (this.options.textureUrl) {
-      const loader = new THREE.TextureLoader();
+      const loader = new THREE.TextureLoader(this.loadingManager);
       loader.load(this.options.textureUrl, (texture) => {
         texture.colorSpace = THREE.SRGBColorSpace;
         material.map = texture;

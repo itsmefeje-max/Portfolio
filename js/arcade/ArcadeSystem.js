@@ -31,7 +31,8 @@ export class ArcadeSystem {
     this.camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 2400);
     this.camera.position.set(0, 10, 32);
 
-    THREE.DefaultLoadingManager.onLoad = () => {
+    this.loadingManager = new THREE.LoadingManager();
+    this.loadingManager.onLoad = () => {
       const overlay = document.getElementById('loading-overlay');
       if (!overlay) return;
       overlay.classList.add('hidden');
@@ -52,7 +53,7 @@ export class ArcadeSystem {
     this.activeSim = null;
     this.isTransitioning = false;
 
-    this.earthRenderer = new EarthRenderer(this.scene);
+    this.earthRenderer = new EarthRenderer(this.scene, this.loadingManager);
     this.cameraDirector = new CameraDirector(this.camera, this.renderer.domElement);
     this.globalSunLight = new THREE.DirectionalLight(0xffffff, 2.4);
     this.globalSunLight.position.set(30, 8, 20);

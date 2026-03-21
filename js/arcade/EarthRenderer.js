@@ -3,14 +3,14 @@ import * as THREE from 'three';
 const EARTH_RADIUS = 10;
 
 export class EarthRenderer {
-  constructor(scene) {
+  constructor(scene, loadingManager) {
     this.scene = scene;
     this.radius = EARTH_RADIUS;
     this.group = new THREE.Group();
     this.group.name = 'OrbitalEarthGroup';
     this.scene.add(this.group);
 
-    this.loader = new THREE.TextureLoader();
+    this.loader = new THREE.TextureLoader(loadingManager);
     this.quality = window.matchMedia('(max-width: 767px)').matches ? 'compact' : 'full';
     this.textures = {
       day: this.loader.load('assets/textures/earth-blue-marble.jpg'),

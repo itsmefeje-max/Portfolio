@@ -27,7 +27,7 @@ export class SolarSystemSimulation {
 
     this.bodies = BODY_DEFINITIONS.map((definition) => ({
       definition,
-      renderer: new CelestialBodyRenderer(this.baseGroup, definition)
+      renderer: new CelestialBodyRenderer(this.baseGroup, definition, system.loadingManager)
     }));
 
     const earthRenderer = this.bodies.find((body) => body.definition.name === 'Earth')?.renderer;
@@ -41,7 +41,7 @@ export class SolarSystemSimulation {
       rotationSpeed: 0.008,
       tilt: 0.04,
       summary: 'Earth companion orbiting inside the larger heliocentric composition.'
-    });
+    }, system.loadingManager);
 
     this.sunLight = new THREE.PointLight(0xfff1bf, 5, 2000, 1.5);
     this.baseGroup.add(this.sunLight);
