@@ -87,6 +87,41 @@ export class TimeEngine {
   }
 
   /**
+   * Calculates the approximate heliocentric mean longitude for a given planet.
+   * This provides a real-world relative angle for planetary alignment.
+   * @param {string} planetName
+   * @param {Date} date
+   * @returns {number} Angle in radians
+   */
+  getPlanetMeanLongitude(planetName, date) {
+    const now = date || new Date();
+    const time = now.getTime();
+    const jd = (time / 86400000) + 2440587.5;
+    const d = jd - 2451545.0; // Days since J2000
+
+    let L = 0; // Mean longitude in degrees
+    const name = planetName.toLowerCase();
+
+    // Approximate Mean Longitude (L) = L0 + n * d
+    switch (name) {
+      case 'mercury': L = 252.25032350 + 4.0923344368 * d; break;
+      case 'venus':   L = 181.97909950 + 1.6021302244 * d; break;
+      case 'earth':   L = 100.46435 + 0.98560910 * d; break;
+      case 'mars':    L = 355.45332 + 0.52402073 * d; break;
+      case 'jupiter': L = 34.40438 + 0.08308530 * d; break;
+      case 'saturn':  L = 49.94432 + 0.03344422 * d; break;
+      case 'uranus':  L = 313.23218 + 0.01172580 * d; break;
+      case 'neptune': L = -55.120029 + 0.005995147 * d; break;
+      case 'moon':    L = 218.316 + 13.176396 * d; break; // Moon's mean longitude relative to Earth
+      default: return 0;
+    }
+
+    L %= 360;
+    if (L < 0) L += 360;
+    return (L * Math.PI) / 180;
+  }
+
+  /**
    * Calculates the subsolar point (latitude and longitude where the sun is overhead).
    * @param {Date} date
    * @returns {Object} { lat, lon } in degrees.
