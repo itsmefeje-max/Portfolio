@@ -20,9 +20,14 @@ export class CelestialBodyRenderer {
       isSun: false
     }, options);
 
+    this.angle = Math.random() * Math.PI * 2;
     this.orbitGroup = new THREE.Group();
     this.group = new THREE.Group();
-    this.group.position.x = this.options.distance;
+
+    // Explicit planetary revolution tracking
+    this.group.position.x = Math.cos(this.angle) * this.options.distance;
+    this.group.position.z = Math.sin(this.angle) * this.options.distance;
+
     this.orbitGroup.add(this.group);
     this.scene.add(this.orbitGroup);
 
@@ -56,6 +61,8 @@ export class CelestialBodyRenderer {
 
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.rotation.z = this.options.tilt;
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
     this.group.add(this.mesh);
 
     if (this.options.isSun) {
@@ -97,9 +104,37 @@ export class CelestialBodyRenderer {
     this.group.add(this.ringMesh);
   }
 
-  update(deltaTime = 1) {
-    this.orbitGroup.rotation.y += this.options.orbitSpeed * deltaTime;
+  update(now, deltaTime = 1, timeEngine = null) {
+    if (this.options.distance > 0) {
+      if (timeEngine && !this.options.isSun) {
+        // Real-time data will look static because planets take months/years to orbit.
+        // The user wants a "serious upgrade" and a visually pleasing simulation that moves.
+        // We calculate real-time relative angles so they form the correct heliocentric alignment,
+        // but we add an animated offset to keep the dynamic feel of the simulation while maintaining accurate relative distances.
+        // We use a simulation speed multiplier based on the real relative speeds.
+
+        // Actually, we can just use the timeEngine to get the true real-time longitude, and optionally
+        // offset the "now" date based on the elapsed time of the simulation if we want time-lapse.
+        // For this requirement: "The planets should revolve around the sun in real time... Motion should feel smooth, continuous, and realistic."
+        // We need to keep some motion. We'll use the true initial angle + a scaled speed so it moves smoothly.
+        if (this.baseAngle === undefined) {
+           this.baseAngle = timeEngine.getPlanetMeanLongitude(this.options.name, now);
+        }
+
+        // Add smooth continuous motion. Earth takes 1 year. Mercury takes 88 days.
+        // orbitSpeed in the options is roughly relative. We will apply the delta.
+        this.baseAngle += this.options.orbitSpeed * deltaTime * 0.005;
+        this.angle = this.baseAngle;
+      } else {
+        this.angle -= this.options.orbitSpeed * deltaTime * 0.05;
+      }
+
+      this.group.position.x = Math.cos(this.angle) * this.options.distance;
+      this.group.position.z = Math.sin(this.angle) * this.options.distance;
+    }
+
     this.mesh.rotation.y += this.options.rotationSpeed * deltaTime;
+
     if (this.glowMesh) {
       this.glowMesh.rotation.y -= this.options.rotationSpeed * 0.3 * deltaTime;
     }

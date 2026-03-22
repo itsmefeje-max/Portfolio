@@ -44,7 +44,9 @@ export class SolarSystemSimulation {
     }, system.loadingManager);
 
     this.sunLight = new THREE.PointLight(0xfff1bf, 5, 2000, 1.5);
+    this.sunLight.castShadow = true;
     this.baseGroup.add(this.sunLight);
+    this.baseGroup.add(new THREE.AmbientLight(0xffffff, 0.15));
     this.sunLight.position.set(0, 0, 0);
 
     this.selectedBodyName = 'Overview';
@@ -70,42 +72,60 @@ export class SolarSystemSimulation {
       .join('');
 
     uiLayer.innerHTML = `
-      <section class="hud-panel hud-top-left">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Expanded Celestial Layer</div>
-            <h2>Solar System Explorer</h2>
-          </div>
-        </div>
-        <p class="panel-description">Earth now scales into a curated heliocentric experience with intentional orbit compression, cleaner focus states, and modular body rendering.</p>
-        <div class="panel-facts">
-          <div class="data-card"><span class="data-label">Primary Light</span><strong>Local Sun Core</strong></div>
-          <div class="data-card"><span class="data-label">Body Count</span><strong>${this.bodies.length + 1}</strong></div>
-          <div class="data-card"><span class="data-label">Mode</span><strong id="solar-mode-label">Overview</strong></div>
-          <div class="data-card"><span class="data-label">Scale</span><strong>Cinematic</strong></div>
-        </div>
-      </section>
+      <button id="btn-toggle-solar-ui" class="fab-info" aria-label="Toggle Information" title="View Details">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </button>
 
-      <section class="hud-panel hud-top-right">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Body Dossier</div>
-            <h3 id="solar-body-title">Overview</h3>
+      <div id="solar-ui-container" class="ui-container-visible">
+        <section class="hud-panel hud-top-left dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Expanded Celestial Layer</div>
+              <h2>Solar System Explorer</h2>
+            </div>
           </div>
-        </div>
-        <p class="panel-description" id="solar-body-summary">Select a celestial body to reframe the camera and move from Earth outward into the larger system.</p>
-      </section>
+          <p class="panel-description">Earth now scales into a curated heliocentric experience with intentional orbit compression, cleaner focus states, and modular body rendering.</p>
+          <div class="panel-facts">
+            <div class="data-card"><span class="data-label">Primary Light</span><strong>Local Sun Core</strong></div>
+            <div class="data-card"><span class="data-label">Body Count</span><strong>${this.bodies.length + 1}</strong></div>
+            <div class="data-card"><span class="data-label">Mode</span><strong id="solar-mode-label">Overview</strong></div>
+            <div class="data-card"><span class="data-label">Scale</span><strong>Cinematic</strong></div>
+          </div>
+        </section>
 
-      <section class="hud-panel solar-selector">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Celestial Navigation</div>
-            <h3>Choose a body</h3>
+        <section class="hud-panel hud-top-right dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Body Dossier</div>
+              <h3 id="solar-body-title">Overview</h3>
+            </div>
           </div>
-        </div>
-        <div class="selector-grid">${buttons}</div>
-      </section>
+          <p class="panel-description" id="solar-body-summary">Select a celestial body to reframe the camera and move from Earth outward into the larger system.</p>
+        </section>
+
+        <section class="hud-panel solar-selector dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Celestial Navigation</div>
+              <h3>Choose a body</h3>
+            </div>
+          </div>
+          <div class="selector-grid horizontal-scroll-mobile">${buttons}</div>
+        </section>
+      </div>
     `;
+
+    // Initialize UI state based on window width
+    if (window.innerWidth <= 768) {
+      document.getElementById('solar-ui-container').classList.replace('ui-container-visible', 'ui-container-hidden');
+    }
   }
 
   bindEvents() {
@@ -113,6 +133,31 @@ export class SolarSystemSimulation {
       const handler = () => this.focusBody(button.getAttribute('data-target-body'));
       button.addEventListener('click', handler);
       this.boundEvents.push({ element: button, event: 'click', handler });
+    });
+
+    const toggleBtn = document.getElementById('btn-toggle-solar-ui');
+    if (toggleBtn) {
+      const handler = () => {
+        const container = document.getElementById('solar-ui-container');
+        if (container.classList.contains('ui-container-visible')) {
+          container.classList.replace('ui-container-visible', 'ui-container-hidden');
+        } else {
+          container.classList.replace('ui-container-hidden', 'ui-container-visible');
+        }
+      };
+      toggleBtn.addEventListener('click', handler);
+      this.boundEvents.push({ element: toggleBtn, event: 'click', handler });
+    }
+
+    document.querySelectorAll('.btn-close-panel').forEach((closeBtn) => {
+      const handler = (e) => {
+        // Hides the individual panel, or could hide the whole container
+        // For standard behavior, hide the entire container if 'x' is clicked on mobile to save space
+        const container = document.getElementById('solar-ui-container');
+        container.classList.replace('ui-container-visible', 'ui-container-hidden');
+      };
+      closeBtn.addEventListener('click', handler);
+      this.boundEvents.push({ element: closeBtn, event: 'click', handler });
     });
   }
 
@@ -173,9 +218,11 @@ export class SolarSystemSimulation {
     if (uiLayer) uiLayer.innerHTML = '';
   }
 
-  update() {
+  update(now, delta) {
     if (!this.isMounted) return;
-    this.bodies.forEach((body) => body.renderer.update(1));
-    this.moon.update(1);
+
+    // We pass system.timeEngine so bodies can compute their real-time heliocentric positions
+    this.bodies.forEach((body) => body.renderer.update(now, delta, this.system.timeEngine));
+    this.moon.update(now, delta, this.system.timeEngine);
   }
 }

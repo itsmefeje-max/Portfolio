@@ -569,7 +569,7 @@ body.arcade-page {
 @media (max-width: 860px) {
   #arcade-hub-ui { align-items: start; overflow: auto; }
   .hub-shell { padding-block: 24px; }
-  .hub-grid { grid-template-columns: 1fr; }
+  .hub-grid { grid-template-columns: 1fr; gap: 20px; }
   .sim-top-bar {
     top: 12px;
     left: 12px;
@@ -628,9 +628,12 @@ body.arcade-page {
   .sim-actions .btn-control { flex-basis: 100%; }
   .card-content,
   .hub-copy,
-  .hub-grid,
-  .hud-panel { padding: 18px; }
+  .hud-panel { padding: 20px; }
+  .hub-grid { padding: 16px 0; }
   .loading-text { font-size: 0.8rem; letter-spacing: 0.18em; }
+  .selector-grid { grid-template-columns: repeat(2, 1fr); }
+  .hub-hero h1 { font-size: 2rem; }
+  .card-header h2 { font-size: 1.5rem; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -638,4 +641,142 @@ body.arcade-page {
   0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.48); }
   70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
   100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+/* Solar System Explorer UI Toggle Overrides */
+.fab-info {
+  position: absolute;
+  top: 100px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(103, 232, 249, 0.4);
+  color: #67e8f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.fab-info:hover {
+  transform: scale(1.05);
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #67e8f9;
+}
+
+.fab-info:active {
+  transform: scale(0.95);
+}
+
+#solar-ui-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Let clicks pass through empty space */
+  z-index: 50;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#solar-ui-container.ui-container-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#solar-ui-container.ui-container-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hud-panel {
+  pointer-events: auto; /* Re-enable pointer events for panels */
+  position: absolute;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+#solar-ui-container.ui-container-hidden .hud-panel {
+  transform: translateY(20px);
+}
+
+#solar-ui-container.ui-container-visible .hud-panel {
+  transform: translateY(0);
+}
+
+.btn-close-panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.btn-close-panel:hover {
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .fab-info {
+    top: auto;
+    bottom: 24px;
+    right: 24px;
+  }
+
+  .horizontal-scroll-mobile {
+    display: flex !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    padding-bottom: 8px; /* For scrollbar space */
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar for a cleaner look */
+    scrollbar-width: none;
+  }
+  .horizontal-scroll-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .horizontal-scroll-mobile .btn-control {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    white-space: nowrap;
+    min-width: 120px;
+  }
+
+  .solar-selector {
+    position: absolute;
+    bottom: 80px; /* Above the FAB */
+    left: 12px;
+    right: 12px;
+    width: auto !important;
+  }
+
+  /* Adjust placement of other panels on mobile to not overlap */
+  .hud-top-left {
+    top: 90px !important;
+  }
+  .hud-top-right {
+    top: 320px !important;
+  }
+}
+
+
+@media (max-width: 480px) {
+  /* Fix vertical stacking inside the scrolling row for tiny screens */
+  .horizontal-scroll-mobile {
+    gap: 8px;
+  }
 }
