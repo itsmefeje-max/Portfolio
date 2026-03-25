@@ -71,6 +71,9 @@ export class SolarSystemSimulation {
       .map((name) => `<button class="btn-control ${name === 'Overview' ? 'is-active' : ''}" data-target-body="${name}">${name}</button>`)
       .join('');
 
+    const isMobile = window.innerWidth <= 720;
+    const initialVisibilityClass = isMobile ? 'ui-container-hidden' : 'ui-container-visible';
+
     uiLayer.innerHTML = `
       <button id="btn-toggle-solar-ui" class="fab-info" aria-label="Toggle Information" title="View Details">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -80,7 +83,7 @@ export class SolarSystemSimulation {
         </svg>
       </button>
 
-      <div id="solar-ui-container" class="ui-container-visible">
+      <div id="solar-ui-container" class="${initialVisibilityClass}">
         <section class="hud-panel hud-top-left dismissible-panel">
           <button class="btn-close-panel" aria-label="Close Panel">×</button>
           <div class="panel-title">
@@ -139,16 +142,39 @@ export class SolarSystemSimulation {
     if (toggleBtn) {
       const handler = () => {
         const container = document.getElementById('solar-ui-container');
+        const topBar = document.querySelector('.sim-top-bar');
+
         if (container.classList.contains('ui-container-visible')) {
           container.classList.replace('ui-container-visible', 'ui-container-hidden');
+          if (topBar) topBar.style.display = 'none';
         } else {
           container.classList.replace('ui-container-hidden', 'ui-container-visible');
           // Restore hidden panels
           document.querySelectorAll('#solar-ui-container .dismissible-panel').forEach(p => p.style.display = '');
+          if (topBar) topBar.style.display = '';
         }
       };
       toggleBtn.addEventListener('click', handler);
       this.boundEvents.push({ element: toggleBtn, event: 'click', handler });
+    }
+
+    // Hide top bar by default on mobile only
+    const topBar = document.querySelector('.sim-top-bar');
+    if (topBar) {
+      topBar.style.display = window.innerWidth <= 720 ? 'none' : '';
+    }
+
+    // Attach close button listener to top bar
+    const topBarClose = document.querySelector('.sim-top-bar .btn-close-panel');
+    if (topBarClose) {
+      const handler = (e) => {
+        const panel = e.target.closest('.dismissible-panel');
+        if (panel) {
+          panel.style.display = 'none';
+        }
+      };
+      topBarClose.addEventListener('click', handler);
+      this.boundEvents.push({ element: topBarClose, event: 'click', handler });
     }
 
     document.querySelectorAll('#solar-ui-container .btn-close-panel').forEach((closeBtn) => {

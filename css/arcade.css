@@ -350,13 +350,23 @@ body.arcade-page {
   right: 20px;
   z-index: 35;
   border-radius: 24px;
-  padding: 18px 22px;
+  padding: 18px 48px 18px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
   pointer-events: auto;
   box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .sim-top-bar {
+    padding-right: 22px;
+  }
+  .sim-top-bar .btn-close-panel {
+    top: 8px;
+    right: 8px;
+  }
 }
 
 .sim-overview {
@@ -598,7 +608,7 @@ body.arcade-page {
     width: auto !important;
   }
   #sim-content-layer, #solar-ui-container, #orbital-ui-container {
-    padding: 152px 12px 12px;
+    padding: 240px 12px 12px;
     overflow: auto;
     display: grid;
     align-content: space-between;
