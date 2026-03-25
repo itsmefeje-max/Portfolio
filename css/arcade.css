@@ -356,6 +356,7 @@ body.arcade-page {
   justify-content: space-between;
   gap: 18px;
   pointer-events: auto;
+  box-sizing: border-box;
 }
 
 .sim-overview {
@@ -396,6 +397,7 @@ body.arcade-page {
   padding: 18px;
   color: var(--arcade-text);
   pointer-events: auto;
+  box-sizing: border-box;
 }
 
 .hud-top-left { top: 112px; left: 20px; width: min(380px, calc(100vw - 40px)); }
@@ -574,6 +576,7 @@ body.arcade-page {
     top: 12px;
     left: 12px;
     right: 12px;
+    width: auto;
     flex-direction: column;
     align-items: stretch;
   }
@@ -594,25 +597,30 @@ body.arcade-page {
     position: static;
     width: auto !important;
   }
-  #sim-content-layer {
+  #sim-content-layer, #solar-ui-container, #orbital-ui-container {
     padding: 152px 12px 12px;
     overflow: auto;
     display: grid;
     align-content: space-between;
     gap: 12px;
+    pointer-events: none;
+  }
+  #solar-ui-container.ui-container-visible .hud-panel, #orbital-ui-container.ui-container-visible .hud-panel {
+    pointer-events: auto;
   }
   .hud-top-left,
   .hud-top-right,
   .hud-bottom-left,
   .hud-bottom-right,
   .solar-selector {
-    position: static;
-    transform: none;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: 100%;
+    position: static !important;
+    transform: none !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .data-grid,
   .panel-facts,
@@ -674,7 +682,7 @@ body.arcade-page {
   transform: scale(0.95);
 }
 
-#solar-ui-container {
+#solar-ui-container, #orbital-ui-container {
   position: absolute;
   top: 0;
   left: 0;
@@ -685,12 +693,12 @@ body.arcade-page {
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-#solar-ui-container.ui-container-visible {
+#solar-ui-container.ui-container-visible, #orbital-ui-container.ui-container-visible {
   opacity: 1;
   visibility: visible;
 }
 
-#solar-ui-container.ui-container-hidden {
+#solar-ui-container.ui-container-hidden, #orbital-ui-container.ui-container-hidden {
   opacity: 0;
   visibility: hidden;
 }
@@ -701,11 +709,11 @@ body.arcade-page {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
-#solar-ui-container.ui-container-hidden .hud-panel {
+#solar-ui-container.ui-container-hidden .hud-panel, #orbital-ui-container.ui-container-hidden .hud-panel {
   transform: translateY(20px);
 }
 
-#solar-ui-container.ui-container-visible .hud-panel {
+#solar-ui-container.ui-container-visible .hud-panel, #orbital-ui-container.ui-container-visible .hud-panel {
   transform: translateY(0);
 }
 
@@ -754,22 +762,6 @@ body.arcade-page {
     scroll-snap-align: start;
     white-space: nowrap;
     min-width: 120px;
-  }
-
-  .solar-selector {
-    position: absolute;
-    bottom: 80px; /* Above the FAB */
-    left: 12px;
-    right: 12px;
-    width: auto !important;
-  }
-
-  /* Adjust placement of other panels on mobile to not overlap */
-  .hud-top-left {
-    top: 90px !important;
-  }
-  .hud-top-right {
-    top: 320px !important;
   }
 }
 
