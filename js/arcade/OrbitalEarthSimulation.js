@@ -91,99 +91,120 @@ export class OrbitalEarthSimulation {
 
     this.cameraDirector.setMode('ISS');
     this.hud.setCameraMode(this.cameraDirector.modeLabel);
+
+    if (window.innerWidth <= 768) {
+      const container = document.getElementById('orbital-ui-container');
+      if (container) {
+        container.classList.replace('ui-container-visible', 'ui-container-hidden');
+      }
+    }
   }
 
   getTemplate() {
     return `
-      <section class="hud-panel hud-top-left">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Orbital Mission Control</div>
-            <h2>Orbital Earth</h2>
-          </div>
-          <div class="status-pill"><span class="pulse-dot"></span><span id="camera-mode-label">ISS Track</span></div>
-        </div>
-        <p class="panel-description">A refined Earth presentation with live station telemetry, predictive orbital context, and smoother camera choreography across desktop and mobile.</p>
-        <div class="data-grid">
-          <div class="data-card">
-            <span class="data-label">UTC Time</span>
-            <strong id="utc-time">--</strong>
-          </div>
-          <div class="data-card">
-            <span class="data-label">Sun Vector</span>
-            <strong>${new Date().toUTCString().slice(17, 22)} live</strong>
-          </div>
-          <div class="data-card">
-            <span class="data-label">Ground Location</span>
-            <strong id="user-loc">Scanning…</strong>
-          </div>
-          <div class="data-card">
-            <span class="data-label">Local Coordinates</span>
-            <strong id="user-coords">--</strong>
-          </div>
-          <div class="data-card">
-            <span class="data-label">Time Zone</span>
-            <strong id="user-timezone">UTC</strong>
-          </div>
-          <div class="data-card">
-            <span class="data-label">Telemetry State</span>
-            <strong id="status-msg">Initializing</strong>
-          </div>
-        </div>
-      </section>
+      <button id="btn-toggle-orbital-ui" class="fab-info" aria-label="Toggle Information" title="View Details">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </button>
 
-      <section class="hud-panel hud-top-right">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Orbit Readout</div>
-            <h3>ISS Telemetry</h3>
+      <div id="orbital-ui-container" class="ui-container-visible">
+        <section class="hud-panel hud-top-left dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Orbital Mission Control</div>
+              <h2>Orbital Earth</h2>
+            </div>
+            <div class="status-pill"><span class="pulse-dot"></span><span id="camera-mode-label">ISS Track</span></div>
           </div>
-        </div>
-        <div class="hud-stack">
-          <div class="data-row"><span class="data-label">Latitude</span><span class="data-value" id="iss-lat">--</span></div>
-          <div class="data-row"><span class="data-label">Longitude</span><span class="data-value" id="iss-lon">--</span></div>
-          <div class="data-row"><span class="data-label">Altitude</span><span class="data-value" id="iss-alt">--</span></div>
-          <div class="data-row"><span class="data-label">Velocity</span><span class="data-value" id="iss-vel">--</span></div>
-          <div class="data-row"><span class="data-label">Visibility</span><span class="data-value" id="iss-visibility">--</span></div>
-          <div class="timeline-meter"><span id="orbit-progress"></span></div>
-          <div class="data-note" id="orbit-prediction">Forecast horizon 45 min</div>
-        </div>
-      </section>
+          <p class="panel-description">A refined Earth presentation with live station telemetry, predictive orbital context, and smoother camera choreography across desktop and mobile.</p>
+          <div class="data-grid">
+            <div class="data-card">
+              <span class="data-label">UTC Time</span>
+              <strong id="utc-time">--</strong>
+            </div>
+            <div class="data-card">
+              <span class="data-label">Sun Vector</span>
+              <strong>${new Date().toUTCString().slice(17, 22)} live</strong>
+            </div>
+            <div class="data-card">
+              <span class="data-label">Ground Location</span>
+              <strong id="user-loc">Scanning…</strong>
+            </div>
+            <div class="data-card">
+              <span class="data-label">Local Coordinates</span>
+              <strong id="user-coords">--</strong>
+            </div>
+            <div class="data-card">
+              <span class="data-label">Time Zone</span>
+              <strong id="user-timezone">UTC</strong>
+            </div>
+            <div class="data-card">
+              <span class="data-label">Telemetry State</span>
+              <strong id="status-msg">Initializing</strong>
+            </div>
+          </div>
+        </section>
 
-      <section class="hud-panel hud-bottom-left">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Trajectory Layer</div>
-            <h3>Live Orbit Visualization</h3>
+        <section class="hud-panel hud-top-right dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Orbit Readout</div>
+              <h3>ISS Telemetry</h3>
+            </div>
           </div>
-        </div>
-        <p class="data-note">ISS trail history and forward projection are rendered independently for better spatial readability and less visual clutter.</p>
-        <div class="orbit-legend">
-          <span class="legend-item"><span class="legend-swatch trail"></span>Live trail</span>
-          <span class="legend-item"><span class="legend-swatch prediction"></span>Predicted path</span>
-          <span class="legend-item"><span class="legend-swatch user"></span>Ground marker</span>
-        </div>
-        <div class="status-bar">Optimized for smaller screens with stacked panels, larger touch targets, and low-clutter telemetry grouping.</div>
-      </section>
+          <div class="hud-stack">
+            <div class="data-row"><span class="data-label">Latitude</span><span class="data-value" id="iss-lat">--</span></div>
+            <div class="data-row"><span class="data-label">Longitude</span><span class="data-value" id="iss-lon">--</span></div>
+            <div class="data-row"><span class="data-label">Altitude</span><span class="data-value" id="iss-alt">--</span></div>
+            <div class="data-row"><span class="data-label">Velocity</span><span class="data-value" id="iss-vel">--</span></div>
+            <div class="data-row"><span class="data-label">Visibility</span><span class="data-value" id="iss-visibility">--</span></div>
+            <div class="timeline-meter"><span id="orbit-progress"></span></div>
+            <div class="data-note" id="orbit-prediction">Forecast horizon 45 min</div>
+          </div>
+        </section>
 
-      <section class="hud-panel hud-bottom-right">
-        <div class="panel-title">
-          <div>
-            <div class="panel-kicker">Camera Control</div>
-            <h3>Intentional Navigation</h3>
+        <section class="hud-panel hud-bottom-left dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Trajectory Layer</div>
+              <h3>Live Orbit Visualization</h3>
+            </div>
           </div>
-        </div>
-        <div class="control-stack">
-          <div class="control-label">Select a tracking mode</div>
-          <div class="control-group">
-            <button class="btn-control" id="btn-mode-free">Free Orbit</button>
-            <button class="btn-control is-active" id="btn-mode-iss">Track ISS</button>
-            <button class="btn-control" id="btn-mode-user">Locate User</button>
-            <button class="btn-control" id="btn-mode-reset">Reset View</button>
+          <p class="data-note">ISS trail history and forward projection are rendered independently for better spatial readability and less visual clutter.</p>
+          <div class="orbit-legend horizontal-scroll-mobile">
+            <span class="legend-item"><span class="legend-swatch trail"></span>Live trail</span>
+            <span class="legend-item"><span class="legend-swatch prediction"></span>Predicted path</span>
+            <span class="legend-item"><span class="legend-swatch user"></span>Ground marker</span>
           </div>
-          <div class="status-bar">Camera transitions are eased to reduce snapping, focus jitter, and disorienting jumps between targets.</div>
-        </div>
-      </section>
+          <div class="status-bar">Optimized for smaller screens with stacked panels, larger touch targets, and low-clutter telemetry grouping.</div>
+        </section>
+
+        <section class="hud-panel hud-bottom-right dismissible-panel">
+          <button class="btn-close-panel" aria-label="Close Panel">×</button>
+          <div class="panel-title">
+            <div>
+              <div class="panel-kicker">Camera Control</div>
+              <h3>Intentional Navigation</h3>
+            </div>
+          </div>
+          <div class="control-stack">
+            <div class="control-label">Select a tracking mode</div>
+            <div class="control-group horizontal-scroll-mobile">
+              <button class="btn-control" id="btn-mode-free">Free Orbit</button>
+              <button class="btn-control is-active" id="btn-mode-iss">Track ISS</button>
+              <button class="btn-control" id="btn-mode-user">Locate User</button>
+              <button class="btn-control" id="btn-mode-reset">Reset View</button>
+            </div>
+            <div class="status-bar">Camera transitions are eased to reduce snapping, focus jitter, and disorienting jumps between targets.</div>
+          </div>
+        </section>
+      </div>
     `;
   }
 
@@ -200,6 +221,35 @@ export class OrbitalEarthSimulation {
     this.addListener('btn-mode-reset', 'click', () => {
       this.setCameraMode('FREE');
       this.cameraDirector.flyTo(new THREE.Vector3(0, 10, 32), new THREE.Vector3(0, 0, 0));
+    });
+
+    const toggleBtn = document.getElementById('btn-toggle-orbital-ui');
+    if (toggleBtn) {
+      const handler = () => {
+        const container = document.getElementById('orbital-ui-container');
+        if (container) {
+          if (container.classList.contains('ui-container-visible')) {
+            container.classList.replace('ui-container-visible', 'ui-container-hidden');
+          } else {
+            container.classList.replace('ui-container-hidden', 'ui-container-visible');
+            // Restore hidden panels
+            document.querySelectorAll('#orbital-ui-container .dismissible-panel').forEach(p => p.style.display = '');
+          }
+        }
+      };
+      toggleBtn.addEventListener('click', handler);
+      this.boundEvents.push({ element: toggleBtn, event: 'click', handler });
+    }
+
+    document.querySelectorAll('#orbital-ui-container .btn-close-panel').forEach((closeBtn) => {
+      const handler = (e) => {
+        const panel = e.target.closest('.dismissible-panel');
+        if (panel) {
+          panel.style.display = 'none';
+        }
+      };
+      closeBtn.addEventListener('click', handler);
+      this.boundEvents.push({ element: closeBtn, event: 'click', handler });
     });
   }
 

@@ -143,18 +143,20 @@ export class SolarSystemSimulation {
           container.classList.replace('ui-container-visible', 'ui-container-hidden');
         } else {
           container.classList.replace('ui-container-hidden', 'ui-container-visible');
+          // Restore hidden panels
+          document.querySelectorAll('#solar-ui-container .dismissible-panel').forEach(p => p.style.display = '');
         }
       };
       toggleBtn.addEventListener('click', handler);
       this.boundEvents.push({ element: toggleBtn, event: 'click', handler });
     }
 
-    document.querySelectorAll('.btn-close-panel').forEach((closeBtn) => {
+    document.querySelectorAll('#solar-ui-container .btn-close-panel').forEach((closeBtn) => {
       const handler = (e) => {
-        // Hides the individual panel, or could hide the whole container
-        // For standard behavior, hide the entire container if 'x' is clicked on mobile to save space
-        const container = document.getElementById('solar-ui-container');
-        container.classList.replace('ui-container-visible', 'ui-container-hidden');
+        const panel = e.target.closest('.dismissible-panel');
+        if (panel) {
+          panel.style.display = 'none';
+        }
       };
       closeBtn.addEventListener('click', handler);
       this.boundEvents.push({ element: closeBtn, event: 'click', handler });
